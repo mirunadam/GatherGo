@@ -1,32 +1,78 @@
 package com.gathergo.controller;
 
-import com.gathergo.service.AuthService;
-import com.google.firebase.auth.FirebaseToken;
+import com.gathergo.dto.trips.TripDTO;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.WriteResult;
+import com.google.firebase.database.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
+    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("trips");
+
+    @GetMapping()
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTrips() {
+        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+
+                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    trips.add(trip);
+                }
+
+                response.setResult(ResponseEntity.ok(trips));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createTrip(@RequestHeader("Authorization") String authHeader) {
-        try {
-            // Remove the "Bearer " prefix
-            String idToken = authHeader.replace("Bearer ", "").trim();
+    public ResponseEntity<TripDTO> createTrip(@RequestBody TripDTO tripDTO) {
+       ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
 
-            // Verify with Firebase
-            FirebaseToken decodedToken = AuthService.verifyToken(idToken);
-
-            // Extract user ID
-            String uid = decodedToken.getUid();
-
-            // Return success message
-            return ResponseEntity.ok("Trip created for user: " + uid);
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Invalid or expired token");
-        }
+       try {
+           future.get();
+           return ResponseEntity.ok(tripDTO);
+       }
+       catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+       }
     }
+
+//    @PostMapping("/create")
+//    public ResponseEntity<String> createTrip(@RequestHeader("Authorization") String authHeader) {
+//        try {
+//            // Remove the "Bearer " prefix
+//            String idToken = authHeader.replace("Bearer ", "").trim();
+//
+//            // Verify with Firebase
+//            FirebaseToken decodedToken = AuthService.verifyToken(idToken);
+//
+//            // Extract user ID
+//            String uid = decodedToken.getUid();
+//
+//            // Return success message
+//            return ResponseEntity.ok("Trip created for user: " + uid);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(401).body("Invalid or expired token");
+//        }
+//    }
     @GetMapping("/testFirebase")
     public ResponseEntity<String> testFirebase() {
         return ResponseEntity.ok("Firebase is working!");
