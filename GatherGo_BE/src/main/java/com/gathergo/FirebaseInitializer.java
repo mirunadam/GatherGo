@@ -13,7 +13,7 @@ public class FirebaseInitializer {
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl("https://your-project-id.firebaseio.com") // for Realtime DB
+                    .setDatabaseUrl("https://gathergo-9da0b-default-rtdb.firebaseio.com") // for Realtime DB
                     .build();
 
             FirebaseApp.initializeApp(options);
