@@ -3,6 +3,5 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/GatherGo_FE" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/git-filter-repo" vcs="Git" />
   </component>
 </project>
