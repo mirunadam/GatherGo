@@ -1,7 +1,7 @@
-package com.gathergo.service;
+package com.gathergo.loginpage.service;
 
-import com.gathergo.dto.RegisterRequest;
 import com.gathergo.exception.BadRequestException;
+import com.gathergo.loginpage.dto.RegisterRequest;
 import com.gathergo.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
@@ -17,9 +17,7 @@ public class AuthManager {
     public String register(RegisterRequest request) throws Exception {
 
         // VALIDATION
-        if (request.getRole() == null ||
-                !(request.getRole().equalsIgnoreCase("USER") ||
-                        request.getRole().equalsIgnoreCase("AGENCY"))) {
+        if (request.getRole() == null) {
             throw new BadRequestException("Invalid role. Must be USER or AGENCY.");
         }
 

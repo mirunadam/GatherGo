@@ -1,8 +1,8 @@
-package com.gathergo.controller;
+package com.gathergo.loginpage;
 
-import com.gathergo.dto.LoginRequest;
-import com.gathergo.dto.RegisterRequest;
-import com.gathergo.service.AuthManager;
+import com.gathergo.loginpage.dto.LoginRequest;
+import com.gathergo.loginpage.dto.RegisterRequest;
+import com.gathergo.loginpage.service.AuthManager;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

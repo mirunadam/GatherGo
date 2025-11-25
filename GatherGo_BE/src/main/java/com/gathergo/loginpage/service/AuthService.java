@@ -1,4 +1,4 @@
-package com.gathergo.service;
+package com.gathergo.loginpage.service;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;

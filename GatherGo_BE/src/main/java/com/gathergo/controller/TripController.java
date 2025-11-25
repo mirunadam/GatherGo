@@ -1,6 +1,6 @@
 package com.gathergo.controller;
 
-import com.gathergo.service.AuthService;
+import com.gathergo.loginpage.service.AuthService;
 import com.google.firebase.auth.FirebaseToken;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -2,7 +2,7 @@ package com.gathergo.model;
 
 public class User {
     private String uid;
-    private String role;
+    private Role role;
     private String username;
     private String fullName; // or agencyName
     private String email;
@@ -10,7 +10,7 @@ public class User {
 
     public User() {}
 
-    public User(String uid, String role, String username, String fullName, String email, String phone) {
+    public User(String uid, Role role, String username, String fullName, String email, String phone) {
         this.uid = uid;
         this.role = role;
         this.username = username;
@@ -24,7 +24,7 @@ public class User {
         return uid;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
@@ -49,7 +49,7 @@ public class User {
         this.uid = uid;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

@@ -1,4 +1,4 @@
-package com.gathergo.dto;
+package com.gathergo.loginpage.dto;
 
 public class AuthResponse {
     private String token;//firebase id token,used to authenticate request from Angular->backend

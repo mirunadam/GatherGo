@@ -1,4 +1,4 @@
-package com.gathergo.dto;
+package com.gathergo.loginpage.dto;
 
 public class LoginRequest {
     private String email;

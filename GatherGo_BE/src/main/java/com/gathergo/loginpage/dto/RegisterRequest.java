@@ -1,14 +1,16 @@
-package com.gathergo.dto;
+package com.gathergo.loginpage.dto;
+
+import com.gathergo.model.Role;
 
 public class RegisterRequest {
-    private String role; // "USER" or "AGENCY"
+    private Role role; // "USER" or "AGENCY"
     private String username;
     private String password;
     private String fullName;  // or agencyName
     private String email;
     private String phone;
 
-    public String getRole() {
+    public Role getRole() {
         return this.role;
     }
 
@@ -33,7 +35,7 @@ public class RegisterRequest {
     }
 
     // Setters
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
