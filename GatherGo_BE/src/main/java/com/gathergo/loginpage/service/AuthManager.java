@@ -2,12 +2,19 @@ package com.gathergo.loginpage.service;
 
 import com.gathergo.exception.BadRequestException;
 import com.gathergo.loginpage.dto.RegisterRequest;
+import com.gathergo.model.Role;
 import com.gathergo.model.User;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.springframework.stereotype.Service;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DatabaseError;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class AuthManager {
@@ -141,4 +148,57 @@ public class AuthManager {
 
         return response.toString();
     }
+
+
+    public String googleAutoCreateUser(FirebaseToken token) {
+
+        String uid = token.getUid();
+        String email = token.getEmail();
+        String name = token.getName();
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<String> roleResult = new AtomicReference<>(Role.USER.name());
+
+        userRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // ✅ User already exists → return stored role
+                    String role = snapshot.child("role").getValue(String.class);
+                    roleResult.set(role);
+                } else {
+                    // ✅ First Google login → auto-create USER
+                    User profile = new User(
+                            uid,
+                            Role.USER,
+                            name,
+                            name,
+                            email,
+                            ""
+                    );
+                    userRef.setValueAsync(profile);
+                    roleResult.set(Role.USER.name());
+                }
+                latch.countDown();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                latch.countDown();
+            }
+        });
+
+        try {
+            latch.await(); // ✅ Wait until Firebase responds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return roleResult.get();
+    }
+
 }
