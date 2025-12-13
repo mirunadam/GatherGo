@@ -1,4 +1,4 @@
-package com.gathergo.dto.shared;
+package com.gathergo.shared.dto;
 
 public class PointDTO {
     private int latitude;

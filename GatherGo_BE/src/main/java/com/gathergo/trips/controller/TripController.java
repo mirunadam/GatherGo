@@ -1,8 +1,7 @@
-package com.gathergo.controller;
+package com.gathergo.trips.controller;
 
-import com.gathergo.dto.trips.TripDTO;
+import com.gathergo.trips.dto.TripDTO;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.database.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +41,29 @@ public class TripController {
         return response;
     }
 
+    @GetMapping("/{tripid}")
+    public DeferredResult<ResponseEntity<TripDTO>> getTripById(@PathVariable String tripid) {
+        final DeferredResult<ResponseEntity<TripDTO>> response = new DeferredResult<>();
+        dbRef.child(tripid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                response.setResult(ResponseEntity.ok(snapshot.getValue(TripDTO.class)));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
     @PostMapping("/create")
     public ResponseEntity<TripDTO> createTrip(@RequestBody TripDTO tripDTO) {
        ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
+       System.out.println(tripDTO.getUuid());
+       System.out.println(tripDTO.getBudget());
 
        try {
            future.get();
@@ -73,8 +92,4 @@ public class TripController {
 //            return ResponseEntity.status(401).body("Invalid or expired token");
 //        }
 //    }
-    @GetMapping("/testFirebase")
-    public ResponseEntity<String> testFirebase() {
-        return ResponseEntity.ok("Firebase is working!");
-    }
 }

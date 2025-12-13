@@ -1,0 +1,82 @@
+<div class="d-flex justify-content-center">
+  <div class="card m-2 p-3">
+
+    <h2 class="align-self-center mb-3">Create a new trip</h2>
+
+    <form [formGroup]='tripForm' (ngSubmit)='onSubmit()'>
+
+      <div>
+        <div class="me-2 d-flex flex-column justify-content-center gap-1">
+          <div>
+            <mat-form-field class="w-100">
+              <mat-label>Max number of people</mat-label>
+              <input type='number' matInput formControlName="maxPeople">
+              <mat-error *ngIf="tripForm.get('maxPeople')?.invalid && tripForm.get('maxPeople')?.touched" >
+                Invalid email
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-100">
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate required formControlName="dateStart" placeholder="Start date*">
+                <input matEndDate required formControlName="dateEnd" placeholder="End date*">
+              </mat-date-range-input>
+
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+
+              <mat-error *ngIf="tripForm.get('dateStart')?.invalid && tripForm.get('dateStart')?.touched" >
+                Invalid start date
+              </mat-error>
+              <mat-error *ngIf="tripForm.get('dateEnd')?.invalid && tripForm.get('dateEnd')?.touched" >
+                Invalid end date
+              </mat-error>
+            </mat-form-field>
+
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </div>
+
+          <div>
+            <mat-form-field class="w-100">
+              <mat-label>Budget</mat-label>
+              <input type='number' matInput formControlName="budget">
+              <mat-error *ngIf="tripForm.get('budget')?.invalid && tripForm.get('budget')?.touched" >
+                Invalid budget value
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-100">
+              <mat-select placeholder="Currency" [required]="true" formControlName="currency">
+                <mat-option *ngFor="let currency of currencyCodes" [value]="currency">
+                  {{currency}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="tripForm.get('currency')?.invalid && tripForm.get('currency')?.touched" >
+                Invalid currency
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <div>
+          <h5>Destination</h5>
+          <google-map [center]="center" [zoom]="zoom" (mapClick)="setLocation($event)">
+            <map-marker *ngIf="location" [position]="location"></map-marker>
+          </google-map>
+
+          <div *ngIf="tripForm.get('location')?.invalid && tripForm.get('location')?.touched" class="invalid">
+            Invalid location selected
+          </div>
+        </div>
+      </div>
+
+      <button class="w-100 mt-2 submit" type="submit" mat-button>
+        Save
+      </button>
+    </form>
+  </div>
+</div>

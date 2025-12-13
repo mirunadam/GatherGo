@@ -3,12 +3,8 @@ import { ApiService } from './services/api.service';
 
 @Component({
   selector: 'app-root',
-  template: `
-    <h1>Items from Backend</h1>
-    <ul>
-      <li *ngFor="let item of items">{{ item.name }}</li>
-    </ul>
-  `
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   items: any[] = [];
