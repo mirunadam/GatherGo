@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
+// import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
+import { Observable, from, switchMap, map } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import firebase from 'firebase/compat/app';
 
 export interface RegisterPayload {
   role: 'USER' | 'AGENCY';
@@ -23,7 +25,7 @@ export interface LoginPayload {
 export class AuthService {
   private baseUrl = 'http://localhost:8080/auth';
 
-  constructor(private http: HttpClient, private auth: Auth) {}
+  constructor(private http: HttpClient, private afAuth: AngularFireAuth) {}
 
   register(data: RegisterPayload): Observable<string> {
     return this.http.post(`${this.baseUrl}/register`, data, { responseType: 'text' });
@@ -33,15 +35,36 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/login`, data);
   }
 
-   googleLogin(): void {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(this.auth, provider)
-      .then(async result => {
-        const idToken = await result.user.getIdToken();
-        // send the token to backend
-        this.http.post(`${this.baseUrl}/google`, { idToken }, { responseType: 'text' })
-          .subscribe(res => console.log('Backend Google Login Response:', res));
+  //  googleLogin(): void {
+  //   const provider = new GoogleAuthProvider();
+  //   signInWithPopup(this.auth, provider)
+  //     .then(async result => {
+  //       const idToken = await result.user.getIdToken();
+  //       // send the token to backend
+  //       this.http.post(`${this.baseUrl}/google`, { idToken }, { responseType: 'text' })
+  //         .subscribe(res => console.log('Backend Google Login Response:', res));
+  //     })
+  //     .catch(err => console.error('Google login failed', err));
+  // }
+
+  googleLogin(): Observable<any> {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    // Use the compatibility signInWithPopup method from AngularFireAuth
+    return from(this.afAuth.signInWithPopup(provider)).pipe(
+      // The result contains the user object
+      switchMap(result => from(result.user!.getIdToken())),
+      switchMap(idToken => {
+        // Send the token to the Spring Boot backend
+        return this.http.post(`${this.baseUrl}/google`, idToken, {
+          headers: { "Content-Type": "application/json" }
+        });
+      }),
+      map(res => {
+        console.log('Backend Google Login Response:', res);
+        return res;
       })
-      .catch(err => console.error('Google login failed', err));
+    );
   }
+
 }
