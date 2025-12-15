@@ -1,0 +1,274 @@
+// Color Variables
+$color-teal-500: #14b8a6;
+$color-teal-400: #2dd4bf;
+$color-teal-600: #0d9488;
+$color-blue-500: #3b82f6;
+$color-blue-600: #2563eb;
+$color-gray-700: #374151;
+$color-gray-800: #1f2937;
+$color-blue-50: #eff6ff;
+$color-teal-100: #ccfbf1;
+$color-blue-100: #dbeafe;
+$color-orange-100: #ffedd5;
+$color-orange-600: #ea580c;
+
+// LAYOUT & UTILITIES 
+.min-h-screen { min-height: 100vh; }
+.bg-white { background-color: white; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.rounded-2xl { border-radius: 1rem; }
+.rounded-full { border-radius: 9999px; }
+.overflow-hidden { overflow: hidden; }
+
+.flex { display: flex; }
+.grid { display: grid; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.text-center { text-align: center; }
+
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-8 { gap: 2rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-12 { margin-bottom: 3rem; }
+.mt-4 { margin-top: 1rem; }
+.pt-4 { padding-top: 1rem; }
+
+.max-w-7xl { max-width: 1280px; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+.p-6 { padding: 1.5rem; }
+.border-t { border-top: 1px solid #e5e7eb; } // border-gray-200
+.relative { position: relative; }
+
+// HEADER
+.header-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem;
+    
+    .logo-icon {
+        width: 3rem; 
+        height: 3rem;
+        background: linear-gradient(to bottom right, $color-teal-500, $color-blue-500); 
+        border-radius: 9999px;
+        @extend .flex;
+        @extend .items-center;
+        @extend .justify-center;
+    }
+
+    .nav-btn {
+        padding: 0.5rem 1.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .nav-login {
+        color: $color-teal-600;
+        background: none;
+    }
+    .nav-register {
+        background: linear-gradient(to right, $color-teal-500, $color-blue-500);
+        color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        &:hover { background: linear-gradient(to right, $color-teal-600, $color-blue-600); }
+    }
+}
+
+// HERO SECTION 
+.hero-section {
+    background: linear-gradient(to right, $color-teal-500, $color-blue-500, $color-teal-400); 
+    color: white;
+    padding: 5rem 1rem;
+    
+    h2 { font-size: 3rem; }
+    p { color: $color-blue-50; }
+
+    .hero-btn {
+        padding: 1rem 2rem;
+        background-color: white;
+        color: $color-teal-600;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        font-size: 1.125rem;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        &:hover { background-color: $color-blue-50; }
+    }
+}
+
+// SEARCH & FILTERS 
+.search-filters {
+    @extend .max-w-7xl;
+    @extend .mx-auto;
+    @extend .px-4;
+    // Overlap the hero section
+    margin-top: -2rem; 
+    position: relative; 
+    z-index: 10; 
+
+    .form-input {
+        width: 100%;
+        padding: 0.5rem 1rem 0.5rem 2.5rem; 
+        border: 1px solid #d1d5db; 
+        border-radius: 0.5rem;
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px $color-teal-500; 
+        }
+    }
+
+    .icon-input {
+        position: absolute;
+        left: 0.75rem; 
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1.25rem;
+        height: 1.25rem;
+        color: #9ca3af; 
+    }
+
+    .items-end { align-items: flex-end; }
+
+    .clear-btn {
+        background-color: #f3f4f6; 
+        color: $color-gray-700;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        &:hover { background-color: #e5e7eb; }
+    }
+}
+
+// FEATURED TRIPS 
+.featured-trips {
+    @extend .max-w-7xl;
+    @extend .mx-auto;
+    @extend .px-4;
+    @extend .py-16;
+}
+
+.trip-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    @extend .gap-6;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+}
+
+.trip-card {
+    background-color: white;
+    border-radius: 1rem;
+    @extend .shadow-lg;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+    &:hover {
+        @extend .shadow-xl;
+    }
+}
+
+.trip-image-container {
+    height: 12rem; 
+    overflow: hidden;
+}
+
+.trip-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+    &:hover { transform: scale(1.05); }
+}
+
+.trip-detail {
+    @extend .flex;
+    @extend .items-center;
+    @extend .gap-2;
+    color: #4b5563; 
+    @extend .mb-2;
+}
+
+.price-action {
+    @extend .flex;
+    @extend .items-center;
+    @extend .justify-between;
+    @extend .mt-4;
+    @extend .pt-4;
+    @extend .border-t;
+}
+
+.price-text {
+    font-size: 1.5rem; 
+    color: $color-teal-600;
+}
+
+.join-btn {
+    padding: 0.5rem 1rem; 
+    background: linear-gradient(to right, $color-teal-500, $color-blue-500);
+    color: white;
+    @extend .rounded-lg !optional;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    &:hover { background: linear-gradient(to right, $color-teal-600, $color-blue-600); }
+}
+
+.no-trips-message {
+    text-align: center;
+    color: $color-gray-700;
+    font-size: 1.25rem;
+    padding: 2rem;
+}
+
+
+// FEATURES SECTION 
+.features-section {
+    background-color: white;
+    @extend .py-16;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    @extend .gap-8;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.feature-card {
+    @extend .text-center;
+}
+
+.feature-icon {
+    width: 4rem; 
+    height: 4rem; 
+    @extend .rounded-full;
+    @extend .flex;
+    @extend .items-center;
+    @extend .justify-center;
+    margin: 0 auto 1rem;
+}
+
+.feature-icon.bg-teal-100 svg { color: $color-teal-600; }
+.feature-icon.bg-blue-100 svg { color: $color-blue-600; }
+.feature-icon.bg-orange-100 svg { color: $color-orange-600; }
