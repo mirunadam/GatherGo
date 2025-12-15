@@ -1,0 +1,77 @@
+<div class="min-h-screen">
+  <header class="bg-white shadow-sm">
+    <div class="header-content">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" color="white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7 text-white">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+          <h1 class="text-3xl text-gray-800">GatherGo</h1>
+        </div>
+        
+        <div class="flex gap-3">
+            <ng-container *ngIf="!isLoggedIn">
+                <button
+                    (click)="onNavigate('login')"
+                    class="nav-btn nav-login"
+                >
+                    Login
+                </button>
+                <button
+                    (click)="onNavigate('register')"
+                    class="nav-btn nav-register"
+                >
+                    Register
+                </button>
+            </ng-container>
+
+            <ng-container *ngIf="isLoggedIn">
+                <span class="welcome-message">Welcome, {{ userEmail }}!</span>
+                <button
+                    (click)="logout()"
+                    class="nav-btn nav-logout"
+                >
+                    Logout
+                </button>
+            </ng-container>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-5xl mb-6">Plan Your Next Adventure Together</h2>
+      <p class="text-xl mb-8 text-blue-50">
+        Collaborate with friends, family, and travel experts to create unforgettable journeys
+      </p>
+
+      <button
+        *ngIf="!isLoggedIn"
+        (click)="onNavigate('register')"
+        class="hero-btn"
+      >
+        Start Planning Now
+      </button>
+      <button
+        *ngIf="isLoggedIn"
+        (click)="onNavigate('dashboard')"
+        class="hero-btn"
+      >
+        Go to Dashboard
+      </button>
+    </div>
+  </section>
+
+  <section class="search-filters">
+    </section>
+
+  <section class="featured-trips">
+    </section>
+
+  <section class="features-section">
+    </section>
+</div>
