@@ -26,3 +26,7 @@ $my-theme: mat.define-light-theme((
 .invalid {
   color: red;
 }
+
+* {
+  box-sizing: border-box;
+}

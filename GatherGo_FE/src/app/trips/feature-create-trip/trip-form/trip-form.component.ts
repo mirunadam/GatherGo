@@ -12,6 +12,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 import {TripService} from "../../services/trip.service";
 import {TripDto} from "../../domain/trip.dto";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-trip-form',
@@ -38,7 +39,8 @@ export class TripFormComponent {
   location: google.maps.LatLngLiteral | null = null;
   currencyCodes = currencyCodeItems;
 
-  constructor(private fb: FormBuilder, private tripService: TripService) {
+  constructor(private fb: FormBuilder, private tripService: TripService,
+              private router: Router) {
 
   }
 
@@ -82,7 +84,7 @@ export class TripFormComponent {
     }
 
     this.tripService.createTrip(trip).subscribe(() => {
-      console.log("Save successful!");
+      this.router.navigate(['']);
     });
   }
 }
