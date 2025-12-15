@@ -15,7 +15,9 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // Allow Angular frontend to access the backend
                 registry.addMapping("/**") // all endpoints
-                        .allowedOrigins("http://localhost:4200") // Angular dev server
+                        .allowedOrigins("*") // Angular dev server
+                        .allowedOriginPatterns("*")
+                        .allowedOrigins("http://localhost:4200")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

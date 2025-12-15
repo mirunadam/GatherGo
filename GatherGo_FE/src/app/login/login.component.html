@@ -1,0 +1,19 @@
+<div class="auth-page">
+  <h2>Login</h2>
+
+  <form (ngSubmit)="submit()" #f="ngForm">
+    <label>Email</label>
+    <input [(ngModel)]="form.email" name="email" type="email" required />
+
+    <label>Password</label>
+    <input [(ngModel)]="form.password" name="password" type="password" required />
+
+    <button type="submit" [disabled]="loading || f.invalid">
+      {{ loading ? 'Logging in...' : 'Login' }}
+    </button>
+  </form>
+
+  <button type="button" (click)="googleLogin()">Login with Google</button>
+
+  <p class="msg" *ngIf="message">{{ message }}</p>
+</div>
