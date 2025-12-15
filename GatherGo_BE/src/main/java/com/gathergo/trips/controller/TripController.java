@@ -62,8 +62,6 @@ public class TripController {
     @PostMapping("/create")
     public ResponseEntity<TripDTO> createTrip(@RequestBody TripDTO tripDTO) {
        ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
-       System.out.println(tripDTO.getUuid());
-       System.out.println(tripDTO.getBudget());
 
        try {
            future.get();
@@ -73,23 +71,4 @@ public class TripController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
        }
     }
-
-//    @PostMapping("/create")
-//    public ResponseEntity<String> createTrip(@RequestHeader("Authorization") String authHeader) {
-//        try {
-//            // Remove the "Bearer " prefix
-//            String idToken = authHeader.replace("Bearer ", "").trim();
-//
-//            // Verify with Firebase
-//            FirebaseToken decodedToken = AuthService.verifyToken(idToken);
-//
-//            // Extract user ID
-//            String uid = decodedToken.getUid();
-//
-//            // Return success message
-//            return ResponseEntity.ok("Trip created for user: " + uid);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(401).body("Invalid or expired token");
-//        }
-//    }
 }

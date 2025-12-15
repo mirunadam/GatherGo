@@ -12,6 +12,10 @@ export class TripService {
   constructor(private http: HttpClient) {
   }
 
+  public getAllTrips() {
+    return this.http.get<TripDto[]>(this.url);
+  }
+
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }

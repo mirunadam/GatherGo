@@ -10,19 +10,20 @@ import { FormsModule } from '@angular/forms';
 // import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 
-import { AngularFireModule } from '@angular/fire/compat'; 
+import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { HomeComponent } from './home/home.component';
 import { TripFormComponent } from './trips/feature-create-trip/trip-form/trip-form.component';
 import {GoogleMapsModule} from "@angular/google-maps";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { FeatureTripListComponent } from './trips/feature-trip-list/feature-trip-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,11 +31,11 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     AppRoutingModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase), // Initialize Firebase app
-    AngularFireAuthModule
-    AppRoutingModule,
+    AngularFireAuthModule,
+    FeatureTripListComponent,
     TripFormComponent,
     GoogleMapsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [], //ask daca mai trebe pus ceva aici
   bootstrap: [AppComponent]
