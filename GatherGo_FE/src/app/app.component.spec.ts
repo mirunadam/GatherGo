@@ -27,3 +27,4 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('.content span')?.textContent).toContain('GatherGo_FE app is running!');
   });
 });
+//SCHIMBARE DE TEST

@@ -1,0 +1,32 @@
+<div class="auth-page">
+  <h2>Register</h2>
+
+  <form (ngSubmit)="submit()" #f="ngForm">
+    <label>Role</label>
+    <select [(ngModel)]="form.role" name="role" required>
+      <option value="USER">User</option>
+      <option value="AGENCY">Travel Agency</option>
+    </select>
+
+    <label>Username</label>
+    <input [(ngModel)]="form.username" name="username" required />
+
+    <label>Full name / Agency name</label>
+    <input [(ngModel)]="form.fullName" name="fullName" required />
+
+    <label>Email</label>
+    <input [(ngModel)]="form.email" name="email" type="email" required />
+
+    <label>Phone</label>
+    <input [(ngModel)]="form.phone" name="phone" required />
+
+    <label>Password</label>
+    <input [(ngModel)]="form.password" name="password" type="password" required minlength="6" />
+
+    <button type="submit" [disabled]="loading || f.invalid">
+      {{ loading ? 'Registering...' : 'Register' }}
+    </button>
+  </form>
+
+  <p class="msg" *ngIf="message">{{ message }}</p>
+</div>
