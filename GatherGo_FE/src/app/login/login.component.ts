@@ -1,10 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthService, LoginPayload } from '../services/auth.service';
 import { Router } from '@angular/router';
-
-// import { GoogleAuthProvider } from "firebase/auth";
-// import { Auth, signInWithPopup } from "@angular/fire/auth";
-// import { HttpClient } from "@angular/common/http";
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,98 +8,50 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  form = {
-    email: '',
-    password: ''
-  };
 
-
+  username = '';
+  password = '';
+  error = '';
   loading = false;
-  message = '';
 
   constructor(
-    private auth: AuthService, 
-    private router: Router,
-
-    //for Google login
-    // private firebaseAuth: Auth,
-    // private http: HttpClient
-
+    private auth: AuthService,
+    private router: Router
   ) {}
 
   submit() {
-    this.message = '';
+    this.error = '';
     this.loading = true;
 
-    this.auth.login(this.form).subscribe({
+    const payload = {
+      email: this.username,   // backend expects email
+      password: this.password
+    };
+
+    this.auth.login(payload).subscribe({
       next: (res) => {
         this.loading = false;
 
-        // store token + uid
-        localStorage.setItem('idToken', res.idToken);
-        localStorage.setItem('uid', res.localId);
+        // Adjust keys if backend response differs
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('uid', res.uid);
+        localStorage.setItem('role', res.role);
         localStorage.setItem('email', res.email);
 
-        this.message = 'Login successful!';
-        this.router.navigate(['/']); // go home
+        this.router.navigate(['/']);
       },
       error: (err) => {
         this.loading = false;
-        this.message = err?.error || 'Login failed';
+        this.error = err?.error?.message || 'Invalid username or password';
       }
     });
   }
 
-  //google login
-   googleLogin() {
-  //   const provider = new GoogleAuthProvider();
+  goToRegister() {
+    this.router.navigate(['/register']);
+  }
 
-  //   signInWithPopup(this.firebaseAuth, provider)
-  //     .then(async result => {
-
-  //       // Get Firebase ID token
-  //       const idToken = await result.user.getIdToken();
-
-  //       // Send token to your Spring Boot backend
-  //       this.http.post<any>("http://localhost:8080/auth/google", idToken, {
-  //         headers: { "Content-Type": "application/json" }
-  //       }).subscribe({
-  //         next: (res) => {
-  //           // Store backend auth response
-  //           localStorage.setItem('idToken', res.token);
-  //           localStorage.setItem('uid', res.uid);
-  //           localStorage.setItem('role', res.role);
-
-  //           this.message = 'Google login successful!';
-  //           this.router.navigate(['/']);
-  //         },
-  //         error: (err) => {
-  //           console.error(err);
-  //           this.message = 'Google login failed on backend';
-  //         }
-  //       });
-
-  //     })
-  //     .catch(err => {
-  //       console.error(err);
-  //       this.message = 'Google popup login failed';
-  //     });
-  // }
-
-  this.auth.googleLogin().subscribe({
-      next: (res: any) => {
-        // Store backend auth response (using data returned from the service's Observable)
-        localStorage.setItem('idToken', res.token);
-        localStorage.setItem('uid', res.uid);
-        localStorage.setItem('role', res.role);
-
-        this.message = 'Google login successful!';
-        this.router.navigate(['/']);
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.message = 'Google login failed on frontend or backend';
-      }
-    });
+  goToHome() {
+    this.router.navigate(['/']);
   }
 }

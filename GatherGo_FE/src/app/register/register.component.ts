@@ -1,40 +1,65 @@
 import { Component } from '@angular/core';
-import { AuthService, RegisterPayload } from '../services/auth.service';
+import { Router } from '@angular/router';
+
+type Role = 'user' | 'agency';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
+  role: Role = 'user';
 
-  form: RegisterPayload = {
-    role: 'USER',
-    username: '',
-    fullName: '',
-    email: '',
-    phone: '',
-    password: ''
-  };
+  username = '';
+  fullName = '';
+  email = '';
+  phone = '';
+  password = '';
+  confirmPassword = '';
 
-  loading = false;
-  message = '';
+  error = '';
 
-  constructor(private auth: AuthService) {}
+  constructor(private router: Router) {}
+
+  selectRole(role: Role) {
+    this.role = role;
+  }
 
   submit() {
-    this.message = '';
-    this.loading = true;
+    this.error = '';
 
-    this.auth.register(this.form).subscribe({
-      next: (uid) => {
-        this.loading = false;
-        this.message = `Registered successfully! UID: ${uid}`;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.message = err?.error || 'Register failed';
-      }
+    if (this.password !== this.confirmPassword) {
+      this.error = 'Passwords do not match';
+      return;
+    }
+
+    if (this.password.length < 6) {
+      this.error = 'Password must be at least 6 characters';
+      return;
+    }
+
+    console.log('Register:', {
+      username: this.username,
+      fullName: this.fullName,
+      email: this.email,
+      phone: this.phone,
+      role: this.role,
     });
+
+    this.router.navigate(['/login']);
   }
+
+  goToHome() {
+    this.router.navigate(['/']);
+  }
+
+  googleRegister() {
+  // TEMP: UI only
+  console.log('Google register clicked');
+
+  // Later:
+  // - trigger Firebase Google popup
+  // - send token to backend
+}
+
 }
