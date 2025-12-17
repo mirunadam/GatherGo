@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 @import "bootstrap/scss/bootstrap";
+@import 'material-icons/iconfont/material-icons.css';
 
 html {
   @include mat.core();
@@ -29,4 +30,9 @@ $my-theme: mat.define-light-theme((
 
 * {
   box-sizing: border-box;
+}
+
+.btn-primary {
+    color: whitesmoke !important;
+    background-color: darkcyan !important;
 }
