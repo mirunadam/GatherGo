@@ -13,6 +13,9 @@ public class TripDTO {
     private int budget;
     private CurrencyCode currency;
     private int maxPeople;
+    private String itinerary;
+    private String accommodation;
+    private String imageURL;
 
     public TripDTO() {
 
@@ -72,5 +75,29 @@ public class TripDTO {
 
     public void setMaxPeople(int maxPeople) {
         this.maxPeople = maxPeople;
+    }
+
+    public String getItinerary() {
+        return itinerary;
+    }
+
+    public void setItinerary(String itinerary) {
+        this.itinerary = itinerary;
+    }
+
+    public String getAccommodation() {
+        return accommodation;
+    }
+
+    public void setAccommodation(String accommodation) {
+        this.accommodation = accommodation;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 }

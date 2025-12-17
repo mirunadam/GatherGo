@@ -1,9 +1,18 @@
 .card {
   margin: auto;
-  width: auto;
+  width: 75%;
 }
 
-.submit {
-  color: whitesmoke !important;
-  background-color: darkcyan;
+.image-preview {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+
+  max-width: 60%;
+}
+
+textarea {
+  min-height: 100px;
 }

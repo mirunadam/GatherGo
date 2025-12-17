@@ -1,7 +1,10 @@
 <div class="d-flex justify-content-center">
   <div class="card m-2 p-3">
 
-    <h2 class="align-self-center mb-3">Create a new trip</h2>
+    <div class="d-flex justify-content-center align-items-center mb-3">
+      <button class="btn-primary me-auto" mat-button (click)="goBack()"><mat-icon>arrow_back</mat-icon> Go back</button>
+      <h2 class="position-absolute">Create a new trip</h2>
+    </div>
 
     <form [formGroup]='tripForm' (ngSubmit)='onSubmit()'>
 
@@ -62,19 +65,56 @@
 
         </div>
 
-        <div>
-          <h5>Destination</h5>
-          <google-map [center]="center" [zoom]="zoom" (mapClick)="setLocation($event)">
-            <map-marker *ngIf="location" [position]="location"></map-marker>
-          </google-map>
+        <div class="d-md-flex gap-3">
+          <div>
+            <h5>Destination</h5>
+            <google-map [center]="center" [zoom]="zoom" (mapClick)="setLocation($event)">
+              <map-marker *ngIf="location" [position]="location"></map-marker>
+            </google-map>
 
-          <div *ngIf="tripForm.get('location')?.invalid && tripForm.get('location')?.touched" class="invalid">
-            Invalid location selected
+            <div *ngIf="tripForm.get('location')?.invalid && tripForm.get('location')?.touched" class="invalid">
+              Invalid location selected
+            </div>
+          </div>
+
+          <div>
+            <div>
+              <div class="w-100">
+                <div>Add an image</div>
+                <input type="file" (change)="onFileSelected($event)" />
+
+                <div class="image-preview mt-2">
+                  <img *ngIf="selectedFile" [src]="imagePreviewUrl" alt=""/>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <button class="w-100 mt-2 submit" type="submit" mat-button>
+      <div class="mt-4">
+        <mat-form-field class="w-100">
+          <mat-label>Itinerary</mat-label>
+          <textarea matInput cdkTextareaAutosize class="w-100" formControlName="itinerary">
+          </textarea>
+          <mat-error *ngIf="tripForm.get('itinerary')?.invalid && tripForm.get('itinerary')?.touched" >
+            Invalid budget value
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field class="w-100">
+          <mat-label>Accommodation details</mat-label>
+          <textarea matInput cdkTextareaAutosize class="w-100" formControlName="accommodation">
+          </textarea>
+          <mat-error *ngIf="tripForm.get('accommodation')?.invalid && tripForm.get('accommodation')?.touched" >
+            Invalid budget value
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <button class="w-100 mt-2 btn-primary" type="submit" mat-button>
         Save
       </button>
     </form>

@@ -17,6 +17,7 @@ import { TripFormComponent } from './trips/feature-create-trip/trip-form/trip-fo
 import {GoogleMapsModule} from "@angular/google-maps";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { FeatureTripListComponent } from './trips/feature-trip-list/feature-trip-list.component';
+import { TripViewCardComponent } from './trips/feature-trip-list/trip-view-card/trip-view-card.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { FeatureTripListComponent } from './trips/feature-trip-list/feature-trip
     TripFormComponent,
     GoogleMapsModule,
     BrowserAnimationsModule,
+    TripViewCardComponent,
   ],
   providers: [], //ask daca mai trebe pus ceva aici
   bootstrap: [AppComponent]
