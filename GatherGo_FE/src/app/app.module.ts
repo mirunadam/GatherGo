@@ -7,12 +7,13 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { FormsModule } from '@angular/forms';
 // import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-// import { provideAuth, getAuth } from '@angular/fire/auth';
+//import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 
 import { AngularFireModule } from '@angular/fire/compat'; 
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { HomeComponent } from './home/home.component';
+//import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,8 @@ import { HomeComponent } from './home/home.component';
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase), // Initialize Firebase app
     AngularFireAuthModule
+    // provideFirebaseApp(() => initializeApp(environment.firebase)),
+    // provideAuth(() => getAuth()),
   ],
   providers: [], //ask daca mai trebe pus ceva aici
   bootstrap: [AppComponent]
