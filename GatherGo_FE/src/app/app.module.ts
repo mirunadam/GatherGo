@@ -13,6 +13,7 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire/compat'; 
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { HomeComponent } from './home/home.component';
+import { ProfileComponent } from './profile/profile.component';
 //import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 
 @NgModule({
@@ -20,7 +21,8 @@ import { HomeComponent } from './home/home.component';
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent
+    HomeComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

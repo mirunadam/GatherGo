@@ -77,8 +77,9 @@ const publicTrips: Trip[] = [
 
 export class HomeComponent implements OnInit {
 
-   isLoggedIn = false;
+  isLoggedIn = false;
   userEmail: string | null = null;
+  userName: string | null = null;
 
   constructor(private router: Router) { }
 
@@ -89,6 +90,7 @@ export class HomeComponent implements OnInit {
    // Checks if the user has an ID token in localStorage
   checkLoginStatus(): void {
     this.userEmail = localStorage.getItem('email');
+    this.userName = localStorage.getItem('username');
     this.isLoggedIn = !!localStorage.getItem('idToken');
   }
 
@@ -136,7 +138,10 @@ export class HomeComponent implements OnInit {
   onNavigate(path: string): void {
     if (path === 'login' || path === 'register') {
       this.router.navigate([`/${path}`]);
-    } else {
+    } else if(path == 'profile'){
+      this.router.navigate([`/${path}`]);
+    }
+    else{
       console.warn(`Attempted navigation to unknown path: ${path}`);
     }
   }
