@@ -35,23 +35,43 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/login`, data);
   }
 
-  // ✅ New unified Google Login method
-  googleLogin(): Observable<any> {
+    googleLogin(): Observable<any> {
     const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-
-    // 1. Open the popup using AngularFire Compatibility API
+    
+    // Use the compatibility signInWithPopup method from AngularFireAuth
     return from(this.afAuth.signInWithPopup(provider)).pipe(
-      // 2. Extract the ID Token from the user result
+      // The result contains the user object
       switchMap(result => from(result.user!.getIdToken())),
-      // 3. Send the raw token to your Spring Boot backend
       switchMap(idToken => {
+        // Send the token to the Spring Boot backend
         return this.http.post(`${this.baseUrl}/google`, idToken, {
           headers: { "Content-Type": "application/json" }
         });
+      }),
+      map(res => {
+        console.log('Backend Google Login Response:', res);
+        return res;
       })
     );
   }
+
+  // ✅ New unified Google Login method
+  // googleLogin(): Observable<any> {
+  //   const provider = new firebase.auth.GoogleAuthProvider();
+  //   provider.setCustomParameters({ prompt: 'select_account' });
+
+  //   // 1. Open the popup using AngularFire Compatibility API
+  //   return from(this.afAuth.signInWithPopup(provider)).pipe(
+  //     // 2. Extract the ID Token from the user result
+  //     switchMap(result => from(result.user!.getIdToken())),
+  //     // 3. Send the raw token to your Spring Boot backend
+  //     switchMap(idToken => {
+  //       return this.http.post(`${this.baseUrl}/google`, idToken, {
+  //         headers: { "Content-Type": "application/json" }
+  //       });
+  //     })
+  //   );
+  // }
 
   //  googleLogin(): void {
   //   const provider = new GoogleAuthProvider();

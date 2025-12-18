@@ -1,56 +1,53 @@
 import { Component } from '@angular/core';
+import { AuthService, RegisterPayload } from '../services/auth.service';
 import { Router } from '@angular/router';
-
-type Role = 'user' | 'agency';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-  role: Role = 'user';
 
-  username = '';
-  fullName = '';
-  email = '';
-  phone = '';
-  password = '';
-  confirmPassword = '';
+  form: RegisterPayload = {
+    role: 'USER',
+    username: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+  };
 
-  error = '';
+  loading = false;
+  message = '';
+  confirmPassword='';
 
-  constructor(private router: Router) {}
-
-  selectRole(role: Role) {
-    this.role = role;
-  }
+  constructor(private auth: AuthService,
+    private router: Router
+  ) {}
 
   submit() {
-    this.error = '';
+    this.message = '';
+    this.loading = true;
 
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Passwords do not match';
-      return;
-    }
-
-    if (this.password.length < 6) {
-      this.error = 'Password must be at least 6 characters';
-      return;
-    }
-
-    console.log('Register:', {
-      username: this.username,
-      fullName: this.fullName,
-      email: this.email,
-      phone: this.phone,
-      role: this.role,
+    this.auth.register(this.form).subscribe({
+      next: (uid) => {
+        this.loading = false;
+        this.message = `Registered successfully! UID: ${uid}`;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.message = err?.error || 'Register failed';
+      }
     });
-
-    this.router.navigate(['/login']);
   }
 
-  goToHome() {
+   goToHome() {
     this.router.navigate(['/']);
+  }
+
+  selectRole(role: RegisterPayload["role"]) {
+    this.form.role = role;
   }
 
   googleRegister() {
@@ -60,6 +57,6 @@ export class RegisterComponent {
   // Later:
   // - trigger Firebase Google popup
   // - send token to backend
+  }
 }
 
-}

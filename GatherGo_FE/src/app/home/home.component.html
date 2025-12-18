@@ -39,7 +39,12 @@
             </ng-container>
 
             <ng-container *ngIf="isLoggedIn">
-                <span class="welcome-message">Welcome, {{ userEmail }}!</span>
+                <button
+                    (click)="onNavigate('profile')"
+                    class="nav-btn nav-logout"
+                >
+                    {{userEmail}}
+                </button>
                 <button
                     (click)="logout()"
                     class="nav-btn nav-logout"

@@ -1,0 +1,23 @@
+.btn-gradient {
+  background: linear-gradient(to right, #14b8a6, #3b82f6);
+  transition: all 0.3s ease;
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+.input-style {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  &:focus {
+    outline: none;
+    border-color: #14b8a6;
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+  }
+}
+
+// Add other layout utilities if you aren't using Tailwind CSS globally
+.max-w-4xl { max-width: 56rem; }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
