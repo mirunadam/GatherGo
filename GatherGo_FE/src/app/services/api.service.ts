@@ -7,13 +7,13 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private API_URL = 'http://localhost:8080/api'; // backend base URL
+  private API_URL = 'http://localhost:8080/api/trips/testFirebase'; // backend base URL
 
   constructor(private http: HttpClient) { }
 
   // Example: GET all items
   getItems(): Observable<any> {
-    return this.http.get(`${this.API_URL}/items`);
+    return this.http.get(`${this.API_URL}`);
   }
 
   // Example: POST data
