@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/images")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 public class ImageUploadController {
 
     private FirebaseService firebaseService;
