@@ -113,6 +113,7 @@ export class ProfileComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Failed to upload image. Please try again.';
+        console.log(err);
         this.loading = false;
       }
     });
@@ -133,7 +134,7 @@ private saveProfileData(photoUrl: string | null): void {
     email: this.user.email,
     phone: this.user.phone,
     password: this.showPasswordFields ? this.passwords.new : null,
-    profilePictureUrl: photoUrl // ✅ This is now a short URL, not Base64!
+    profilePictureUrl: photoUrl
   };
 
   this.profileService.updateUser(payload).subscribe({
