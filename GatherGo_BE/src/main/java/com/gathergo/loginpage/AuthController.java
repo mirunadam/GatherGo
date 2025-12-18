@@ -33,23 +33,16 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody String idToken) {
         try {
-            // 1. Remove quotes if the token was sent as a JSON string
-            String cleanedToken = idToken.replace("\"", "");
-
-            // 2. Verify the token using your existing service
-            FirebaseToken decoded = AuthService.verifyToken(cleanedToken);
+            FirebaseToken decoded = AuthService.verifyToken(idToken);
             String uid = decoded.getUid();
-            String email = decoded.getEmail();
 
-            // 3. Get/Create user role
+            // Auto-create user profile if needed
             String role = authManager.googleAutoCreateUser(decoded);
 
-            // 4. Return the full response
             return ResponseEntity.ok(new AuthResponse(
-                    cleanedToken,
+                    idToken,
                     uid,
-                    role,
-                    email
+                    role
             ));
 
         } catch (Exception e) {

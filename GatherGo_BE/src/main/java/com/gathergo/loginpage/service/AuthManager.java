@@ -88,6 +88,17 @@ public class AuthManager {
 
         String uid = userRecord.getUid();
 
+        try {
+            UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
+                    .setPhoneNumber(request.getPhone());
+
+            FirebaseAuth.getInstance().updateUser(updateRequest);
+        } catch (Exception e) {
+            // Log the error but don't stop the process if Auth update fails
+            // after account creation is already successful
+            System.err.println("Failed to update Auth phone number: " + e.getMessage());
+        }
+
         // 🔹 SAVE USER PROFILE IN REALTIME DB
         User profile = new User(
                 uid,
