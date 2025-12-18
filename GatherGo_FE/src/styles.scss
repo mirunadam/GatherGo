@@ -1,15 +1,10 @@
-<<<<<<< HEAD
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-input {
-  background-color: white !important;
-  color: #1f2937 !important; /* gray-800 */
-=======
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 @import "bootstrap/scss/bootstrap";
 @import 'material-icons/iconfont/material-icons.css';
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 html {
   @include mat.core();
@@ -43,5 +38,4 @@ $my-theme: mat.define-light-theme((
 .btn-primary {
     color: whitesmoke !important;
     background-color: darkcyan !important;
->>>>>>> 7c13567f3db0c2639d03980ea6b64faca32b46b8
 }
