@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProfileService } from '../services/profile.service';
 
 interface Trip {
   id: string;
@@ -81,10 +82,24 @@ export class HomeComponent implements OnInit {
   userEmail: string | null = null;
   userName: string | null = null;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private profileService: ProfileService) { }
 
   ngOnInit(): void {
     this.checkLoginStatus();
+
+    if (this.isLoggedIn) {
+      const uid = localStorage.getItem('uid');
+      if (uid) {
+        this.profileService.getUser(uid).subscribe({
+          next: (data) => {
+            // "data.username" comes from your Java Backend DTO
+            this.userName = data.username || data.fullname; 
+            // Optional: Save it so you don't have to fetch it next time
+            localStorage.setItem('username', this.userName || '');
+          }
+        });
+      }
+    }
   }
 
    // Checks if the user has an ID token in localStorage
@@ -99,7 +114,8 @@ export class HomeComponent implements OnInit {
     localStorage.removeItem('idToken');
     localStorage.removeItem('uid');
     localStorage.removeItem('email');
-    localStorage.removeItem('role'); // Clear role if stored
+    localStorage.removeItem('role');
+    localStorage.removeItem('username');
 
     this.checkLoginStatus(); // Update state
     this.router.navigate(['/login']);
