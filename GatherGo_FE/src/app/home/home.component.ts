@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
+import { TripService } from '../trips/services/trip.service';
+import { TripDto } from '../trips/domain/trip.dto';
 
-interface Trip {
+
+// The simple interface your Landing Page HTML expects
+interface FrontendTrip {
   id: string;
   name: string;
   location: string;
@@ -12,61 +16,16 @@ interface Trip {
   imageUrl: string;
 }
 
-// Static Data Array 
-const publicTrips: Trip[] = [
+// Keep static trips for demo/fallback
+const STATIC_TRIPS: FrontendTrip[] = [
   {
-    id: '1',
+    id: 'mock-1',
     name: 'Tropical Paradise Getaway',
     location: 'Maldives',
     agency: 'Paradise Travel Co.',
     price: 2499,
-    period: 'Dec 15-22, 2025',
-    imageUrl: 'https://images.unsplash.com/photo-1660315250109-075f6b142ebc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMGJlYWNoJTIwcGFyYWRpc2V8ZW58MXx8fHwxNzY0ODkwMTg5fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: '2',
-    name: 'Alpine Adventure Trek',
-    location: 'Swiss Alps',
-    agency: 'Mountain Explorers',
-    price: 3200,
-    period: 'Jan 10-20, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1713959989861-2425c95e9777?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHxtb3VudGFpbiUyMGxhbmRzY2FwZSUyMHRyYXZlbHxlbnwxfHx8fDE3NjQ4Njc1Nzd8MA&lib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: '3',
-    name: 'City Lights Tour',
-    location: 'New York City',
-    agency: 'Urban Adventures',
-    price: 1800,
-    period: 'Feb 5-12, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1493134799591-2c9eed26201a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHxjaXR5JTIwc2t5bGluZXxlbnwxfHx8fDE3NjQ5MTgxMjN8MA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: '4',
-    name: 'Desert Safari Experience',
-    location: 'Dubai',
-    agency: 'Desert Dreams Travel',
-    price: 2100,
-    period: 'Mar 1-8, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1598696737715-1e7741c387ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHxkZXNlcnQlMjBhZHZlbnR1cmV8ZW58MXx8fHwxNzY0OTQ5MDI2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: '5',
-    name: 'European Heritage Tour',
-    location: 'Rome, Italy',
-    agency: 'Europa Wanderlust',
-    price: 2800,
-    period: 'Apr 15-25, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1716481731194-67a27f868c23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHxldXJvcGVhbiUyMGNpdHklMjB0cmF2ZWx8ZW58MXx8fHwxNzY0OTA2MzM0fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: '6',
-    name: 'Group Adventure Package',
-    location: 'Bali, Indonesia',
-    agency: 'Paradise Travel Co.',
-    price: 1950,
-    period: 'May 10-18, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1764547167909-288254064bd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmF2ZWwlMjBncm91cCUyMGZyaWVuZHN8ZW58MXx8fHwxNzY0OTQ5MDI3fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    period: 'Dec 15 - Dec 22',
+    imageUrl: 'https://images.unsplash.com/photo-1660315250109-075f6b142ebc?auto=format&fit=crop&w=1080&q=80',
   },
 ];
 
@@ -75,97 +34,162 @@ const publicTrips: Trip[] = [
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-
 export class HomeComponent implements OnInit {
+  
+  // Google Maps Geocoder
+  private geocoder = new google.maps.Geocoder();
 
+  // State
+  searchTerm: string = '';
+  locationFilter: string = '';
+  agencyFilter: string = '';
+  
+  allTrips: FrontendTrip[] = [...STATIC_TRIPS]; // Start with static
   isLoggedIn = false;
-  userEmail: string | null = null;
   userName: string | null = null;
 
-  constructor(private router: Router, private profileService: ProfileService) { }
+  constructor(
+    private router: Router, 
+    private profileService: ProfileService,
+    private tripService: TripService 
+  ) { }
 
   ngOnInit(): void {
     this.checkLoginStatus();
+    this.loadRealTrips(); // Load your database trips
 
     if (this.isLoggedIn) {
       const uid = localStorage.getItem('uid');
       if (uid) {
         this.profileService.getUser(uid).subscribe({
-          next: (data) => {
-            // "data.username" comes from your Java Backend DTO
-            this.userName = data.username || data.fullname; 
-            // Optional: Save it so you don't have to fetch it next time
-            localStorage.setItem('username', this.userName || '');
-          }
+            next: (data) => {
+                this.userName = data.username || data.fullname;
+                localStorage.setItem('username', this.userName || '');
+            }
         });
       }
     }
   }
 
-   // Checks if the user has an ID token in localStorage
+  loadRealTrips(): void {
+    // 1. Fetch Real Trips from Backend
+    this.tripService.getAllTrips().subscribe({
+      next: (dtos: TripDto[]) => {
+        
+        // 2. Convert Backend DTOs to Frontend UI Models
+        const mappedTrips = dtos.map(dto => this.mapTripDtoToFrontendModel(dto));
+
+        // 3. Combine them (Real trips first, then static ones)
+        this.allTrips = [...mappedTrips, ...STATIC_TRIPS];
+      },
+      error: (err) => console.error('Failed to load trips', err)
+    });
+  }
+
+  // Converts Complex DTO -> Simple UI Object 
+  private mapTripDtoToFrontendModel(dto: TripDto): FrontendTrip {
+    
+    // Create the base object
+    const frontendTrip: FrontendTrip = {
+      id: dto.uuid,
+      name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
+      location: 'Loading location...', // Placeholder while geocoding runs
+      agency: 'Community Trip', // Real trips don't have agencies yet
+      price: dto.budget || 0,
+      period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
+      imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
+    };
+
+    // Trigger Async Geocoding (Smooth Update)
+    if (dto.location && dto.location.latitude && dto.location.longitude) {
+      const latLng = { lat: dto.location.latitude, lng: dto.location.longitude };
+      
+      this.geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          // Update the specific trip's location string when data arrives
+          frontendTrip.location = this.extractCityAndCountry(results[0]);
+        } else {
+          frontendTrip.location = 'Unknown Location';
+        }
+      });
+    } else {
+      frontendTrip.location = 'Online / TBD';
+    }
+
+    return frontendTrip;
+  }
+
+  // --- Helpers ---
+
+  private formatDatePeriod(start: Date | string | null | undefined, end: Date | string | null | undefined): string {
+    if (!start || !end) return 'Flexible Dates';
+    // Handle both String (ISO) and Date objects safely
+    const s = new Date(start);
+    const e = new Date(end);
+    
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+    return `${s.toLocaleDateString('en-US', options)} - ${e.toLocaleDateString('en-US', options)}`;
+  }
+
+  private extractCityAndCountry(result: google.maps.GeocoderResult): string {
+    let city = '';
+    let country = '';
+
+    for (const component of result.address_components) {
+      const types = component.types;
+      if (!city && (types.includes('locality') || types.includes('postal_town') || types.includes('administrative_area_level_2'))) {
+        city = component.long_name;
+      }
+      if (!country && types.includes('country')) {
+        country = component.long_name;
+      }
+    }
+    return city ? `${city}, ${country}` : country || 'Unknown Location';
+  }
+
+  // --- Navigation & Filtering ---
+
+  get filteredTrips(): FrontendTrip[] {
+    return this.allTrips.filter(trip => {
+      const search = this.searchTerm.toLowerCase();
+      const locFilter = this.locationFilter.toLowerCase();
+      const agFilter = this.agencyFilter.toLowerCase();
+
+      // Safe check in case fields are missing
+      const n = trip.name ? trip.name.toLowerCase() : '';
+      const l = trip.location ? trip.location.toLowerCase() : '';
+      const a = trip.agency ? trip.agency.toLowerCase() : '';
+
+      return (n.includes(search) || l.includes(search)) &&
+             (!locFilter || l.includes(locFilter)) &&
+             (!agFilter || a.includes(agFilter));
+    });
+  }
+
   checkLoginStatus(): void {
     this.userEmail = localStorage.getItem('email');
     this.userName = localStorage.getItem('username');
     this.isLoggedIn = !!localStorage.getItem('idToken');
   }
 
-  // Simple logout function: clears local storage and navigates to login
-  logout(): void {
-    localStorage.removeItem('idToken');
-    localStorage.removeItem('uid');
-    localStorage.removeItem('email');
-    localStorage.removeItem('role');
-    localStorage.removeItem('username');
+  onNavigate(path: string): void {
+    if (path === 'login' || path === 'register' || path === 'profile' || path === 'dashboard') {
+      this.router.navigate([`/${path}`]);
+    }
+  }
 
-    this.checkLoginStatus(); // Update state
+  logout(): void {
+    localStorage.clear();
+    this.checkLoginStatus();
     this.router.navigate(['/login']);
   }
 
-  // State variables 
-  searchTerm: string = '';
-  locationFilter: string = '';
-  agencyFilter: string = '';
-
-  allTrips: Trip[] = publicTrips;
-  
-
-  // Angular equivalent of the React component's filter logic (using a getter)
-  get filteredTrips(): Trip[] {
-    return this.allTrips.filter(trip => {
-      const lowerSearch = this.searchTerm.toLowerCase();
-      const lowerLocationFilter = this.locationFilter.toLowerCase();
-      const lowerAgencyFilter = this.agencyFilter.toLowerCase();
-
-      // 1. Matches Search Term (Name OR Location)
-      const matchesSearch = trip.name.toLowerCase().includes(lowerSearch) ||
-                            trip.location.toLowerCase().includes(lowerSearch);
-                            
-      // 2. Matches Location Filter
-      const matchesLocation = !lowerLocationFilter || trip.location.toLowerCase().includes(lowerLocationFilter);
-      
-      // 3. Matches Agency Filter
-      const matchesAgency = !lowerAgencyFilter || trip.agency.toLowerCase().includes(lowerAgencyFilter);
-      
-      return matchesSearch && matchesLocation && matchesAgency;
-    });
-  }
-
-  // Programmatic navigation (equivalent to onNavigate)
-  onNavigate(path: string): void {
-    if (path === 'login' || path === 'register') {
-      this.router.navigate([`/${path}`]);
-    } else if(path == 'profile'){
-      this.router.navigate([`/${path}`]);
-    }
-    else{
-      console.warn(`Attempted navigation to unknown path: ${path}`);
-    }
-  }
-
-  // Event handler to clear all filters
   clearFilters(): void {
     this.searchTerm = '';
     this.locationFilter = '';
     this.agencyFilter = '';
   }
+
+  // Additional vars needed for your HTML bindings
+  userEmail: string | null = null;
 }
