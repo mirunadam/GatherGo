@@ -10,11 +10,16 @@ import { FormsModule } from '@angular/forms';
 //import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 
-import { AngularFireModule } from '@angular/fire/compat'; 
+import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { HomeComponent } from './home/home.component';
 import { ProfileComponent } from './profile/profile.component';
 //import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { TripFormComponent } from './trips/feature-create-trip/trip-form/trip-form.component';
+import {GoogleMapsModule} from "@angular/google-maps";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { FeatureTripListComponent } from './trips/feature-trip-list/feature-trip-list.component';
+import { TripViewCardComponent } from './trips/feature-trip-list/trip-view-card/trip-view-card.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +27,7 @@ import { ProfileComponent } from './profile/profile.component';
     LoginComponent,
     RegisterComponent,
     HomeComponent,
-    ProfileComponent
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,9 +35,12 @@ import { ProfileComponent } from './profile/profile.component';
     AppRoutingModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase), // Initialize Firebase app
-    AngularFireAuthModule
-    // provideFirebaseApp(() => initializeApp(environment.firebase)),
-    // provideAuth(() => getAuth()),
+    AngularFireAuthModule,
+    GoogleMapsModule,
+    BrowserAnimationsModule,
+    TripViewCardComponent,
+    TripFormComponent,
+    FeatureTripListComponent,
   ],
   providers: [], //ask daca mai trebe pus ceva aici
   bootstrap: [AppComponent]
