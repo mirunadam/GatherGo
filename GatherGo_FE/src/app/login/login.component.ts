@@ -43,6 +43,7 @@ export class LoginComponent {
         localStorage.setItem('idToken', res.idToken);
         localStorage.setItem('uid', res.localId);
         localStorage.setItem('email', res.email);
+        localStorage.setItem('username', res.username);
 
         this.message = 'Login successful!';
         this.router.navigate(['/']); // go home
@@ -105,5 +106,13 @@ export class LoginComponent {
         this.message = 'Google login failed on frontend or backend';
       }
     });
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
+  }
+
+  goToHome() {
+    this.router.navigate(['/']);
   }
 }
