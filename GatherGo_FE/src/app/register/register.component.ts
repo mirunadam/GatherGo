@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService, RegisterPayload } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -14,13 +15,16 @@ export class RegisterComponent {
     fullName: '',
     email: '',
     phone: '',
-    password: ''
+    password: '',
   };
 
   loading = false;
   message = '';
+  confirmPassword='';
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService,
+    private router: Router
+  ) {}
 
   submit() {
     this.message = '';
@@ -37,4 +41,22 @@ export class RegisterComponent {
       }
     });
   }
+
+   goToHome() {
+    this.router.navigate(['/']);
+  }
+
+  selectRole(role: RegisterPayload["role"]) {
+    this.form.role = role;
+  }
+
+  googleRegister() {
+  // TEMP: UI only
+  console.log('Google register clicked');
+
+  // Later:
+  // - trigger Firebase Google popup
+  // - send token to backend
+  }
 }
+
