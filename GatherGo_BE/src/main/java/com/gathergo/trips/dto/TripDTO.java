@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class TripDTO {
     private String uuid;
+    private String ownerEmail;
     private PointDTO location;
     private Date dateStart;
     private Date dateEnd;
@@ -16,6 +17,7 @@ public class TripDTO {
     private String itinerary;
     private String accommodation;
     private String imageURL;
+    private boolean isPublic;
 
     public TripDTO() {
 
@@ -99,5 +101,21 @@ public class TripDTO {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getOwnerEmail() {
+        return ownerEmail;
+    }
+
+    public void setOwnerEmail(String ownerEmail) {
+        this.ownerEmail = ownerEmail;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 }
