@@ -16,3 +16,19 @@
 textarea {
   min-height: 100px;
 }
+
+.visibility-button {
+  height: 150px;
+  border: 2px solid;
+
+  &.selected {
+    border: 2px solid darkcyan;
+    background-color: oklch(.984 .014 180.72);
+    color: darkcyan;
+  }
+
+  .subtext {
+    font-size: small;
+    font-weight: normal;
+  }
+}

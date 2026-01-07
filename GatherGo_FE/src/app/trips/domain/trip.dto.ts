@@ -3,6 +3,7 @@ import {CurrencyCode} from "../../shared-domain/currency-code-enum";
 
 export interface TripDto {
   uuid: string,
+  ownerEmail: string | null | undefined,
   location: PointDtoModel | null | undefined;
   dateStart: Date | null | undefined;
   dateEnd: Date | null | undefined;
@@ -12,4 +13,5 @@ export interface TripDto {
   itinerary: string | null | undefined;
   accommodation: string | null | undefined;
   imageURL: string | null | undefined;
+  isPublic: boolean;
 }
