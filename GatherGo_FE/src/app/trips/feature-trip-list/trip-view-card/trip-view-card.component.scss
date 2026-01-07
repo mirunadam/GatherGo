@@ -2,11 +2,25 @@
   img {
     width: 100%;
     height: 100%;
-    max-width: 200px;
-    max-height: 100px;
-    object-fit: contain;
   }
+
+  .img-alt {
+    padding: 50px;
+  }
+
+  padding: 0 !important;
+  margin: 0 !important;
   overflow: hidden;
+}
+
+.card {
+  width: 400px;
+  height: 250px;
+
+  .more-menu {
+    bottom: 0;
+    right: 0;
+  }
 }
 
 .image-placeholder {

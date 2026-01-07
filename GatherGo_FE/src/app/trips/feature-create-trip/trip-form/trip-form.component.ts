@@ -1,9 +1,9 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GoogleMapsModule} from "@angular/google-maps";
 import {MatSelectModule} from "@angular/material/select";
 import {CurrencyCode, currencyCodeItems} from "../../../shared-domain/currency-code-enum";
-import {Location, NgForOf, NgIf} from "@angular/common";
+import {Location, NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatInputModule} from "@angular/material/input";
 import {PointDtoModel} from "../../../shared-domain/point-dto.model";
 import {MatDatepickerModule} from "@angular/material/datepicker";
@@ -12,9 +12,12 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 import {TripService} from "../../services/trip.service";
 import {TripDto} from "../../domain/trip.dto";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {FileUploadService} from "../../../services/file-upload.service";
 import {MatIconModule} from "@angular/material/icon";
+import {LoggedInContextService} from "../../../services/logged-in-context.service";
+import {User} from "../../../shared-domain/user-data.model";
+import {UserRole} from "../../../shared-domain/user-role.model";
 
 @Component({
   selector: 'app-trip-form',
@@ -31,33 +34,69 @@ import {MatIconModule} from "@angular/material/icon";
     MatFormFieldModule,
     MatButtonModule,
     NgIf,
-    MatIconModule
+    MatIconModule,
+    NgClass
   ],
   standalone: true,
   providers: [MatDatepickerModule]
 })
-export class TripFormComponent {
+export class TripFormComponent implements OnInit {
   center: google.maps.LatLngLiteral = { lat: 45.7558, lng: 21.2322};
   zoom = 12;
   location: google.maps.LatLngLiteral | null = null;
   currencyCodes = currencyCodeItems;
   selectedFile: File | null = null;
-  imagePreviewUrl: string | null = null;
+  imagePreviewUrl: string | null | undefined = null;
 
-  constructor(private fb: FormBuilder, private tripService: TripService,
-              private router: Router, private fileUploadService: FileUploadService,
-              private routeLocation: Location) {}
+  editUuid: string | undefined = undefined;
+  userData: User | undefined = undefined;
 
   tripForm = this.fb.group({
     location: [null as PointDtoModel | null, [Validators.required]],
+    ownerEmail: [null as string | null, [Validators.required]],
     dateStart: [null as Date | null, [Validators.required]],
     dateEnd: [null as Date | null, [Validators.required]],
-    budget: [null as number | null, [Validators.required], Validators.min(0)],
+    budget: [null as number | null, [Validators.required, Validators.min(0)]],
     currency: [null as CurrencyCode | null, [Validators.required]],
     maxPeople: [null as number | null, [Validators.min(0)]],
     itinerary: [null as string | null, []],
-    accommodation: [null as string | null, []]
+    accommodation: [null as string | null, []],
+    isPublic: [false]
   })
+
+  constructor(private fb: FormBuilder, private tripService: TripService,
+              private router: Router, private fileUploadService: FileUploadService,
+              private routeLocation: Location, private activatedRoute: ActivatedRoute,
+              private loggedInContext: LoggedInContextService) {}
+
+  ngOnInit() {
+    this.editUuid = this.activatedRoute.snapshot.queryParams['uuid'];
+    this.loggedInContext.getUserData().subscribe((res) => {
+      this.userData = res;
+    });
+
+    if(this.editUuid) {
+      this.tripService.getTripByUuid(this.editUuid).subscribe((res) => {
+        this.tripForm.patchValue({
+          location: res.location,
+          ownerEmail: res.ownerEmail,
+          dateStart: res.dateStart,
+          dateEnd: res.dateEnd,
+          budget: res.budget,
+          currency: res.currency,
+          maxPeople: res.maxPeople,
+          itinerary: res.itinerary,
+          accommodation: res.accommodation,
+          isPublic: res.isPublic
+        })
+        this.imagePreviewUrl = res.imageURL;
+        this.location = {
+          lat: res.location?.latitude ?? 0,
+          lng: res.location?.longitude ?? 0
+        }
+      })
+    }
+  }
 
   setLocation($event: any) {
     this.location = {
@@ -74,6 +113,9 @@ export class TripFormComponent {
 
   onSubmit() {
     this.tripForm.markAllAsTouched();
+    this.tripForm.patchValue({
+      ownerEmail: this.tripForm.value.ownerEmail ?? this.userData?.email
+    })
 
     if(this.tripForm.invalid) {
       return;
@@ -83,7 +125,7 @@ export class TripFormComponent {
       this.upload();
     }
     else {
-      this.submitForm(null);
+      this.submitForm(this.imagePreviewUrl ?? null);
     }
 
   }
@@ -108,7 +150,8 @@ export class TripFormComponent {
 
   private submitForm(response: string | null) {
     const trip: TripDto = {
-      uuid: crypto.randomUUID(),
+      uuid: this.editUuid ?? crypto.randomUUID(),
+      ownerEmail: this.tripForm.value.ownerEmail,
       location: this.tripForm.value.location,
       dateStart: this.tripForm.value.dateStart,
       dateEnd: this.tripForm.value.dateEnd,
@@ -117,7 +160,8 @@ export class TripFormComponent {
       maxPeople: this.tripForm.value.maxPeople,
       itinerary: this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
-      imageURL: response
+      imageURL: response,
+      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true
     }
 
     this.tripService.createTrip(trip).subscribe(() => {
@@ -128,4 +172,6 @@ export class TripFormComponent {
   goBack() {
     this.routeLocation.back();
   }
+
+  protected readonly UserRole = UserRole;
 }

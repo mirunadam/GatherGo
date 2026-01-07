@@ -26,6 +26,8 @@ export class FeatureTripListComponent implements OnInit{
   }
 
   ngOnInit() {
+    const email = localStorage.getItem('email');
+
     this.tripService.getAllTrips().subscribe((res) => {
         this.tripsWithCity = res.map((trip) => {
           return {
@@ -43,6 +45,10 @@ export class FeatureTripListComponent implements OnInit{
           });
           return tripWithCity;
         })
+
+      this.tripsWithCity = this.tripsWithCity.filter((tripWithCity) => {
+        return tripWithCity.trip.isPublic || tripWithCity.trip.ownerEmail === email
+      })
     })
   }
 
@@ -77,5 +83,13 @@ export class FeatureTripListComponent implements OnInit{
 
   goToCreateTrips() {
     this.router.navigate(['trip/form']);
+  }
+
+  goToEdit($event: string | undefined) {
+    this.router.navigate(['trip/form'], {
+      queryParams: {
+        uuid: $event
+      }
+    })
   }
 }

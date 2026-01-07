@@ -2,10 +2,6 @@ import { Component } from '@angular/core';
 import { AuthService, LoginPayload } from '../services/auth.service';
 import { Router } from '@angular/router';
 
-// import { GoogleAuthProvider } from "firebase/auth";
-// import { Auth, signInWithPopup } from "@angular/fire/auth";
-// import { HttpClient } from "@angular/common/http";
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -22,7 +18,7 @@ export class LoginComponent {
   message = '';
 
   constructor(
-    private auth: AuthService, 
+    private auth: AuthService,
     private router: Router,
 
     //for Google login
@@ -56,55 +52,21 @@ export class LoginComponent {
 
   //google login
    googleLogin() {
-  //   const provider = new GoogleAuthProvider();
+    this.auth.googleLogin().subscribe({
+        next: (res: any) => {
+          // Store backend auth response (using data returned from the service's Observable)
+          localStorage.setItem('idToken', res.token);
+          localStorage.setItem('uid', res.uid);
+          localStorage.setItem('role', res.role);
 
-  //   signInWithPopup(this.firebaseAuth, provider)
-  //     .then(async result => {
-
-  //       // Get Firebase ID token
-  //       const idToken = await result.user.getIdToken();
-
-  //       // Send token to your Spring Boot backend
-  //       this.http.post<any>("http://localhost:8080/auth/google", idToken, {
-  //         headers: { "Content-Type": "application/json" }
-  //       }).subscribe({
-  //         next: (res) => {
-  //           // Store backend auth response
-  //           localStorage.setItem('idToken', res.token);
-  //           localStorage.setItem('uid', res.uid);
-  //           localStorage.setItem('role', res.role);
-
-  //           this.message = 'Google login successful!';
-  //           this.router.navigate(['/']);
-  //         },
-  //         error: (err) => {
-  //           console.error(err);
-  //           this.message = 'Google login failed on backend';
-  //         }
-  //       });
-
-  //     })
-  //     .catch(err => {
-  //       console.error(err);
-  //       this.message = 'Google popup login failed';
-  //     });
-  // }
-
-  this.auth.googleLogin().subscribe({
-      next: (res: any) => {
-        // Store backend auth response (using data returned from the service's Observable)
-        localStorage.setItem('idToken', res.token);
-        localStorage.setItem('uid', res.uid);
-        localStorage.setItem('role', res.role);
-
-        this.message = 'Google login successful!';
-        this.router.navigate(['/']);
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.message = 'Google login failed on frontend or backend';
-      }
-    });
+          this.message = 'Google login successful!';
+          this.router.navigate(['/']);
+        },
+        error: (err: any) => {
+          console.error(err);
+          this.message = 'Google login failed on frontend or backend';
+        }
+      });
   }
 
   goToRegister() {
