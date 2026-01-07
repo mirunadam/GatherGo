@@ -16,6 +16,10 @@ export class TripService {
     return this.http.get<TripDto[]>(this.url);
   }
 
+  public getTripByUuid(uuid: string) {
+    return this.http.get<TripDto>(this.url + `/${uuid}`);
+  }
+
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }
