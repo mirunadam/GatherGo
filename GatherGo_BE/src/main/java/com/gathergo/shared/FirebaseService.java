@@ -24,7 +24,7 @@ public class FirebaseService {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("firebaseStorageDownloadTokens", token);
 
-        Bucket bucket = StorageClient.getInstance().bucket();
+        Bucket bucket = StorageClient.getInstance().bucket("gathergo-9da0b.firebasestorage.app");
         BlobInfo blobInfo = BlobInfo.newBuilder(bucket.getName(), fileName)
                 .setContentType(file.getContentType())
                 .setMetadata(metadata)

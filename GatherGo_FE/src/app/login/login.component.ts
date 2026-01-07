@@ -2,10 +2,6 @@ import { Component } from '@angular/core';
 import { AuthService, LoginPayload } from '../services/auth.service';
 import { Router } from '@angular/router';
 
-// import { GoogleAuthProvider } from "firebase/auth";
-// import { Auth, signInWithPopup } from "@angular/fire/auth";
-// import { HttpClient } from "@angular/common/http";
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -72,8 +68,6 @@ export class LoginComponent {
         }
       });
   }
-<<<<<<< Updated upstream
-=======
 
   goToRegister() {
     this.router.navigate(['/register']);
@@ -82,5 +76,4 @@ export class LoginComponent {
   goToHome() {
     this.router.navigate(['/']);
   }
->>>>>>> Stashed changes
 }

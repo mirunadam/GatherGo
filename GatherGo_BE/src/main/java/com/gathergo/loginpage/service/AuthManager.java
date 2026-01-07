@@ -88,6 +88,17 @@ public class AuthManager {
 
         String uid = userRecord.getUid();
 
+        try {
+            UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
+                    .setPhoneNumber(request.getPhone());
+
+            FirebaseAuth.getInstance().updateUser(updateRequest);
+        } catch (Exception e) {
+            // Log the error but don't stop the process if Auth update fails
+            // after account creation is already successful
+            System.err.println("Failed to update Auth phone number: " + e.getMessage());
+        }
+
         // 🔹 SAVE USER PROFILE IN REALTIME DB
         User profile = new User(
                 uid,
@@ -199,6 +210,34 @@ public class AuthManager {
         }
 
         return roleResult.get();
+    }
+
+    public User getUserById(String uid) throws InterruptedException {
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<User> userProfile = new AtomicReference<>();
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    userProfile.set(user);
+                }
+                latch.countDown();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                latch.countDown();
+            }
+        });
+
+        latch.await(); // Wait for Firebase to return the data
+        return userProfile.get();
     }
 
 }
