@@ -212,4 +212,32 @@ public class AuthManager {
         return roleResult.get();
     }
 
+    public User getUserById(String uid) throws InterruptedException {
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<User> userProfile = new AtomicReference<>();
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    userProfile.set(user);
+                }
+                latch.countDown();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                latch.countDown();
+            }
+        });
+
+        latch.await(); // Wait for Firebase to return the data
+        return userProfile.get();
+    }
+
 }
