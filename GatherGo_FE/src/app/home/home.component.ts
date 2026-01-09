@@ -35,7 +35,7 @@ const STATIC_TRIPS: FrontendTrip[] = [
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  
+
   // Google Maps Geocoder
   private geocoder = new google.maps.Geocoder();
 
@@ -43,15 +43,15 @@ export class HomeComponent implements OnInit {
   searchTerm: string = '';
   locationFilter: string = '';
   agencyFilter: string = '';
-  
+
   allTrips: FrontendTrip[] = [...STATIC_TRIPS]; // Start with static
   isLoggedIn = false;
   userName: string | null = null;
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private profileService: ProfileService,
-    private tripService: TripService 
+    private tripService: TripService
   ) { }
 
   ngOnInit(): void {
@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit {
     // 1. Fetch Real Trips from Backend
     this.tripService.getAllTrips().subscribe({
       next: (dtos: TripDto[]) => {
-        
+
         // 2. Convert Backend DTOs to Frontend UI Models
         const mappedTrips = dtos.map(dto => this.mapTripDtoToFrontendModel(dto));
 
@@ -86,9 +86,9 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // Converts Complex DTO -> Simple UI Object 
+  // Converts Complex DTO -> Simple UI Object
   private mapTripDtoToFrontendModel(dto: TripDto): FrontendTrip {
-    
+
     // Create the base object
     const frontendTrip: FrontendTrip = {
       id: dto.uuid,
@@ -103,7 +103,7 @@ export class HomeComponent implements OnInit {
     // Trigger Async Geocoding (Smooth Update)
     if (dto.location && dto.location.latitude && dto.location.longitude) {
       const latLng = { lat: dto.location.latitude, lng: dto.location.longitude };
-      
+
       this.geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
           // Update the specific trip's location string when data arrives
@@ -126,7 +126,7 @@ export class HomeComponent implements OnInit {
     // Handle both String (ISO) and Date objects safely
     const s = new Date(start);
     const e = new Date(end);
-    
+
     const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
     return `${s.toLocaleDateString('en-US', options)} - ${e.toLocaleDateString('en-US', options)}`;
   }
@@ -172,10 +172,17 @@ export class HomeComponent implements OnInit {
     this.isLoggedIn = !!localStorage.getItem('idToken');
   }
 
-  onNavigate(path: string): void {
-    if (path === 'login' || path === 'register' || path === 'profile' || path === 'dashboard') {
-      this.router.navigate([`/${path}`]);
+  joinTrip(tripUuid: string) {
+    const email = localStorage.getItem('email');
+    if(email) {
+      this.tripService.addParticipantToTrip(tripUuid, email).subscribe((res) => {
+        console.log(res);
+      });
     }
+  }
+
+  onNavigate(path: string): void {
+    this.router.navigate([`/${path}`]);
   }
 
   logout(): void {
