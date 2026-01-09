@@ -4,6 +4,7 @@ import com.gathergo.shared.dto.CurrencyCode;
 import com.gathergo.shared.dto.PointDTO;
 
 import java.util.Date;
+import java.util.List;
 
 public class TripDTO {
     private String uuid;
@@ -16,8 +17,10 @@ public class TripDTO {
     private int maxPeople;
     private String itinerary;
     private String accommodation;
-    private String imageURL;
+    private String imageURL;//main trip Image
     private boolean isPublic;
+    //Mara
+    private List<String> imageURLs;
 
     public TripDTO() {
 
@@ -117,5 +120,14 @@ public class TripDTO {
 
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
+    }
+
+    //Mara
+    public List<String> getImageURLs(){
+        return imageURLs;
+    }
+
+    public void setImageURLs(List<String> imageURLs){
+        this.imageURLs=imageURLs;
     }
 }
