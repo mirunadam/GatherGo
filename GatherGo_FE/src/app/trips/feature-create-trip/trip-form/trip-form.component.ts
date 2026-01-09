@@ -61,7 +61,8 @@ export class TripFormComponent implements OnInit {
     maxPeople: [null as number | null, [Validators.min(0)]],
     itinerary: [null as string | null, []],
     accommodation: [null as string | null, []],
-    isPublic: [false]
+    isPublic: [false],
+    participants: [[] as string[]]
   })
 
   constructor(private fb: FormBuilder, private tripService: TripService,
@@ -87,7 +88,8 @@ export class TripFormComponent implements OnInit {
           maxPeople: res.maxPeople,
           itinerary: res.itinerary,
           accommodation: res.accommodation,
-          isPublic: res.isPublic
+          isPublic: res.isPublic,
+          participants: res.participants
         })
         this.imagePreviewUrl = res.imageURL;
         this.location = {
@@ -161,7 +163,8 @@ export class TripFormComponent implements OnInit {
       itinerary: this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
       imageURL: response,
-      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true
+      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
+      participants: this.tripForm.value.participants ?? []
     }
 
     this.tripService.createTrip(trip).subscribe(() => {

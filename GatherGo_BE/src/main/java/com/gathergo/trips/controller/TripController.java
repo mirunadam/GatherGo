@@ -59,8 +59,34 @@ public class TripController {
         return response;
     }
 
+    @PostMapping("/addParticipant")
+    public DeferredResult<ResponseEntity<TripDTO>> addParticipant(@RequestParam("uuid") String uuid, @RequestParam("email") String email) {
+        final DeferredResult<ResponseEntity<TripDTO>> response = new DeferredResult<>();
+
+        dbRef.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                TripDTO trip = dataSnapshot.getValue(TripDTO.class);
+                if(!trip.containsParticipant(email)) {
+                    trip.addParticipant(email);
+                    response.setResult(ResponseEntity.ok(createOrUpdateTrip(trip).getBody()));
+                }
+                else {
+                    response.setResult(ResponseEntity.ok(trip));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
     @PostMapping("/create")
-    public ResponseEntity<TripDTO> createTrip(@RequestBody TripDTO tripDTO) {
+    public ResponseEntity<TripDTO> createOrUpdateTrip(@RequestBody TripDTO tripDTO) {
        ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
 
        try {

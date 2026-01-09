@@ -14,4 +14,5 @@ export interface TripDto {
   accommodation: string | null | undefined;
   imageURL: string | null | undefined;
   isPublic: boolean;
+  participants: string[] | null | undefined;
 }
