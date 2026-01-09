@@ -10,10 +10,12 @@ export class ProfileService {
 
   constructor(private http: HttpClient) { }
 
+  //get /profile/{uid}
   getUser(uid: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/${uid}`);
   }
 
+  //put /profile/update
   updateUser(profileData: any): Observable<string> {
     return this.http.put(`${this.baseUrl}/update`, profileData, { responseType: 'text' });
   }

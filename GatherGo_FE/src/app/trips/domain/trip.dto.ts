@@ -13,5 +13,6 @@ export interface TripDto {
   itinerary: string | null | undefined;
   accommodation: string | null | undefined;
   imageURL: string | null | undefined;
+  imageURLs?: string[];
   isPublic: boolean;
 }
