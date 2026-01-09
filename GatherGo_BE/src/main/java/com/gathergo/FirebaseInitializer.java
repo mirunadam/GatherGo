@@ -19,7 +19,7 @@ public class FirebaseInitializer {
                 return;
             }
             InputStream serviceAccount = FirebaseInitializer.class.getClassLoader()
-                    .getResourceAsStream("firebase/firebase-admin.json");
+                    .getResourceAsStream("Add what u need here");
 
             if (serviceAccount == null) {
                 System.err.println("CRITICAL: Firebase JSON file not found in resources folder!");
