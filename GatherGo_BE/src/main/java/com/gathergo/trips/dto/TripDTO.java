@@ -3,8 +3,8 @@ package com.gathergo.trips.dto;
 import com.gathergo.shared.dto.CurrencyCode;
 import com.gathergo.shared.dto.PointDTO;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class TripDTO {
     private String uuid;
@@ -17,10 +17,9 @@ public class TripDTO {
     private int maxPeople;
     private String itinerary;
     private String accommodation;
-    private String imageURL;//main trip Image
+    private String imageURL;
     private boolean isPublic;
-    //Mara
-    private List<String> imageURLs;
+    private ArrayList<String> participants;
 
     public TripDTO() {
 
@@ -122,12 +121,22 @@ public class TripDTO {
         isPublic = aPublic;
     }
 
-    //Mara
-    public List<String> getImageURLs(){
-        return imageURLs;
+    public ArrayList<String> getParticipants() {
+        return participants;
     }
 
-    public void setImageURLs(List<String> imageURLs){
-        this.imageURLs=imageURLs;
+    public void setParticipants(ArrayList<String> participants) {
+        this.participants = participants;
+    }
+
+    public boolean containsParticipant(String participant) {
+        return this.participants != null && this.participants.contains(participant);
+    }
+
+    public void addParticipant(String participant) {
+        if(participants == null) {
+            participants = new ArrayList<>();
+        }
+        participants.add(participant);
     }
 }

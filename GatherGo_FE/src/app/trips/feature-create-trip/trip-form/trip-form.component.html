@@ -113,18 +113,7 @@
           </mat-error>
         </mat-form-field>
       </div>
-      
-      <div class="mt-3">
-        <div>Add extra photos</div>
-        <input type="file" (change)="onMultipleFilesSelected($event)" multiple/>
-        <div cladd="d-flex flex-wrap gap-2 mt-2">
-          <div *ngFor="let url of multipleImagePreviewUrls; let i = index" class="image-preview-multi">
-            <img [src]="url" alt="Extra Photo"/>
-            <button type="button" class="btn-remove" (click)="removePhoto(i)">✕</button>
-          </div>
-        </div>
-      </div>
-      
+
       <div *ngIf="userData?.role === UserRole.USER">
         <div class="my-2">Visibility options</div>
 
