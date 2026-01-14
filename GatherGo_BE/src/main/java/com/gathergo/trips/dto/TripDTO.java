@@ -5,6 +5,7 @@ import com.gathergo.shared.dto.PointDTO;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TripDTO {
     private String uuid;
@@ -17,8 +18,10 @@ public class TripDTO {
     private int maxPeople;
     private String itinerary;
     private String accommodation;
-    private String imageURL;
+    private String imageURL;//main trip Image
     private boolean isPublic;
+    //Mara
+    private List<String> imageURLs;
     private ArrayList<String> participants;
 
     public TripDTO() {
@@ -138,5 +141,14 @@ public class TripDTO {
             participants = new ArrayList<>();
         }
         participants.add(participant);
+    }
+
+    //Mara
+    public List<String> getImageURLs(){
+        return imageURLs;
+    }
+
+    public void setImageURLs(List<String> imageURLs){
+        this.imageURLs=imageURLs;
     }
 }

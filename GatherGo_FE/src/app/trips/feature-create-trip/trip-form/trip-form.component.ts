@@ -18,6 +18,8 @@ import {MatIconModule} from "@angular/material/icon";
 import {LoggedInContextService} from "../../../services/logged-in-context.service";
 import {User} from "../../../shared-domain/user-data.model";
 import {UserRole} from "../../../shared-domain/user-role.model";
+import { forkJoin, Observable, of } from 'rxjs';
+
 
 @Component({
   selector: 'app-trip-form',
@@ -47,6 +49,13 @@ export class TripFormComponent implements OnInit {
   currencyCodes = currencyCodeItems;
   selectedFile: File | null = null;
   imagePreviewUrl: string | null | undefined = null;
+  
+  //Mara
+  multipleFiles: File[] = [];
+  multipleImagePreviewUrls: string[] = [];
+  extraImages: string[] = [];
+
+
 
   editUuid: string | undefined = undefined;
   userData: User | undefined = undefined;
@@ -113,6 +122,14 @@ export class TripFormComponent implements OnInit {
     })
   }
 
+  private createMainImageFormData(): FormData {
+  const formData = new FormData();
+  if (this.selectedFile) {
+    formData.append('image', this.selectedFile);
+  }
+  return formData;
+}
+
   onSubmit() {
     this.tripForm.markAllAsTouched();
     this.tripForm.patchValue({
@@ -123,12 +140,24 @@ export class TripFormComponent implements OnInit {
       return;
     }
 
-    if(this.selectedFile) {
-      this.upload();
-    }
-    else {
-      this.submitForm(this.imagePreviewUrl ?? null);
-    }
+    const mainImage$: Observable<string | null> = this.selectedFile
+    ? this.fileUploadService.uploadFile(this.createMainImageFormData())
+    : of(this.imagePreviewUrl ?? null);
+
+    const extraImages$ = this.uploadExtraPhotos();
+
+    forkJoin([mainImage$, extraImages$]).subscribe({
+      next: ([mainImageUrl, newExtraImages]) => {
+        const allExtraImages=[
+          ...this.extraImages,
+          ...newExtraImages
+        ];
+        this.submitForm(mainImageUrl,allExtraImages);
+      },
+      error: err => {
+        console.error('Upload failed', err);
+      }
+    });
 
   }
 
@@ -137,6 +166,36 @@ export class TripFormComponent implements OnInit {
     if(this.selectedFile) {
       this.imagePreviewUrl = URL.createObjectURL(this.selectedFile);
     }
+  }
+
+  //Mara
+  onMultipleFilesSelected(event: any){
+    const files: FileList=event.target.files;
+
+    for(let i=0;i<files.length;i++){
+      const file=files[i];
+      this.multipleFiles.push(file);
+      const url=URL.createObjectURL(file);
+      this.multipleImagePreviewUrls.push(url);
+    }
+  }
+
+  removePhoto(index: number){
+    this.multipleFiles.splice(index,1); 
+    this.multipleImagePreviewUrls.splice(index,1);
+    this.extraImages.splice(index,1);
+  }
+
+  private uploadExtraPhotos():Observable<string[]>{
+      if (this.multipleFiles.length === 0) return of([]);
+
+      const observables = this.multipleFiles.map(file => {
+        const formData = new FormData();
+        formData.append('image', file);
+        return this.fileUploadService.uploadFile(formData);
+      });
+
+      return forkJoin(observables);
   }
 
   private upload() {
@@ -150,7 +209,7 @@ export class TripFormComponent implements OnInit {
     }
   }
 
-  private submitForm(response: string | null) {
+  private submitForm(mainImageUrl: string | null, extraImages: string[] = []) {
     const trip: TripDto = {
       uuid: this.editUuid ?? crypto.randomUUID(),
       ownerEmail: this.tripForm.value.ownerEmail,
@@ -162,7 +221,8 @@ export class TripFormComponent implements OnInit {
       maxPeople: this.tripForm.value.maxPeople,
       itinerary: this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
-      imageURL: response,
+      imageURL: mainImageUrl,
+      imageURLs: extraImages,
       isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
       participants: this.tripForm.value.participants ?? []
     }

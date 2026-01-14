@@ -35,15 +35,15 @@ const STATIC_TRIPS: FrontendTrip[] = [
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-
+  
   // Google Maps Geocoder
   private geocoder = new google.maps.Geocoder();
+
 
   // State
   searchTerm: string = '';
   locationFilter: string = '';
   agencyFilter: string = '';
-
   allTrips: FrontendTrip[] = [...STATIC_TRIPS]; // Start with static
   isLoggedIn = false;
   userName: string | null = null;
@@ -75,7 +75,6 @@ export class HomeComponent implements OnInit {
     // 1. Fetch Real Trips from Backend
     this.tripService.getAllTrips().subscribe({
       next: (dtos: TripDto[]) => {
-
         // 2. Convert Backend DTOs to Frontend UI Models
         const mappedTrips = dtos.map(dto => this.mapTripDtoToFrontendModel(dto));
 
@@ -86,7 +85,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // Converts Complex DTO -> Simple UI Object
   private mapTripDtoToFrontendModel(dto: TripDto): FrontendTrip {
 
     // Create the base object
@@ -94,19 +92,16 @@ export class HomeComponent implements OnInit {
       id: dto.uuid,
       name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
       location: 'Loading location...', // Placeholder while geocoding runs
-      agency: 'Community Trip', // Real trips don't have agencies yet
+      agency: 'Community Trip', 
       price: dto.budget || 0,
       period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
       imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
     };
 
-    // Trigger Async Geocoding (Smooth Update)
     if (dto.location && dto.location.latitude && dto.location.longitude) {
       const latLng = { lat: dto.location.latitude, lng: dto.location.longitude };
-
       this.geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
-          // Update the specific trip's location string when data arrives
           frontendTrip.location = this.extractCityAndCountry(results[0]);
         } else {
           frontendTrip.location = 'Unknown Location';
@@ -119,14 +114,11 @@ export class HomeComponent implements OnInit {
     return frontendTrip;
   }
 
-  // --- Helpers ---
-
   private formatDatePeriod(start: Date | string | null | undefined, end: Date | string | null | undefined): string {
     if (!start || !end) return 'Flexible Dates';
     // Handle both String (ISO) and Date objects safely
     const s = new Date(start);
     const e = new Date(end);
-
     const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
     return `${s.toLocaleDateString('en-US', options)} - ${e.toLocaleDateString('en-US', options)}`;
   }
@@ -147,15 +139,12 @@ export class HomeComponent implements OnInit {
     return city ? `${city}, ${country}` : country || 'Unknown Location';
   }
 
-  // --- Navigation & Filtering ---
-
   get filteredTrips(): FrontendTrip[] {
     return this.allTrips.filter(trip => {
       const search = this.searchTerm.toLowerCase();
       const locFilter = this.locationFilter.toLowerCase();
       const agFilter = this.agencyFilter.toLowerCase();
 
-      // Safe check in case fields are missing
       const n = trip.name ? trip.name.toLowerCase() : '';
       const l = trip.location ? trip.location.toLowerCase() : '';
       const a = trip.agency ? trip.agency.toLowerCase() : '';
@@ -197,6 +186,5 @@ export class HomeComponent implements OnInit {
     this.agencyFilter = '';
   }
 
-  // Additional vars needed for your HTML bindings
   userEmail: string | null = null;
 }
