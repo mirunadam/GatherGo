@@ -5,7 +5,6 @@ import { AuthService, LoginPayload } from '../services/auth.service';
 //Angular's navigation system
 import { Router } from '@angular/router';
 
-//this is metadata about the component
 @Component({
   //this is an HTML tag special for this component
   selector: 'app-login',

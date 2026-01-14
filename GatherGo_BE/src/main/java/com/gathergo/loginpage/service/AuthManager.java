@@ -94,7 +94,6 @@ public class AuthManager {
         //we extract the FireBase UID
         String uid = userRecord.getUid();
 
-        //we can't set the phone number directly so we have to extract that user and edit the profile to add the phone number
         try {
             UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
                     .setPhoneNumber(request.getPhone());
@@ -106,7 +105,7 @@ public class AuthManager {
             System.err.println("Failed to update Auth phone number: " + e.getMessage());
         }
 
-        //we save the profile in the RealTime DataBase
+        // 🔹 SAVE USER PROFILE IN REALTIME DB
         User profile = new User(
                 uid,
                 request.getRole(),

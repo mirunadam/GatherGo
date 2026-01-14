@@ -18,7 +18,6 @@ import {MatIconModule} from "@angular/material/icon";
 import {LoggedInContextService} from "../../../services/logged-in-context.service";
 import {User} from "../../../shared-domain/user-data.model";
 import {UserRole} from "../../../shared-domain/user-role.model";
-//import { Observable } from 'rxjs';
 import { forkJoin, Observable, of } from 'rxjs';
 
 
@@ -71,7 +70,8 @@ export class TripFormComponent implements OnInit {
     maxPeople: [null as number | null, [Validators.min(0)]],
     itinerary: [null as string | null, []],
     accommodation: [null as string | null, []],
-    isPublic: [false]
+    isPublic: [false],
+    participants: [[] as string[]]
   })
 
   constructor(private fb: FormBuilder, private tripService: TripService,
@@ -97,15 +97,14 @@ export class TripFormComponent implements OnInit {
           maxPeople: res.maxPeople,
           itinerary: res.itinerary,
           accommodation: res.accommodation,
-          isPublic: res.isPublic
+          isPublic: res.isPublic,
+          participants: res.participants
         })
         this.imagePreviewUrl = res.imageURL;
         this.location = {
           lat: res.location?.latitude ?? 0,
           lng: res.location?.longitude ?? 0
         }
-        this.extraImages=res.imageURLs ?? [];
-        this.multipleImagePreviewUrls = [...this.extraImages];
       })
     }
   }
@@ -224,7 +223,8 @@ export class TripFormComponent implements OnInit {
       accommodation: this.tripForm.value.accommodation,
       imageURL: mainImageUrl,
       imageURLs: extraImages,
-      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true
+      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
+      participants: this.tripForm.value.participants ?? []
     }
 
     this.tripService.createTrip(trip).subscribe(() => {

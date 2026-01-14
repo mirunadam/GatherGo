@@ -14,12 +14,10 @@ public class FirebaseInitializer {
     @PostConstruct
     public static void initialize() {
         try {
-            if(!FirebaseApp.getApps().isEmpty()){
-                System.out.println("Firebase already initialised");
-                return;
-            }
+//            FileInputStream serviceAccount =
+//                    new FileInputStream("GatherGo_BE/src/main/resources/gathergo-9da0b-firebase-adminsdk-fbsvc-955a5f33c4.json");
             InputStream serviceAccount = FirebaseInitializer.class.getClassLoader()
-                    .getResourceAsStream("Add what u need here");
+                    .getResourceAsStream("gathergo-9da0b-firebase-adminsdk-fbsvc-955a5f33c4.json");
 
             if (serviceAccount == null) {
                 System.err.println("CRITICAL: Firebase JSON file not found in resources folder!");
