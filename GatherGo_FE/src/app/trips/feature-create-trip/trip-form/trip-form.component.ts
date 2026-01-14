@@ -148,8 +148,12 @@ export class TripFormComponent implements OnInit {
     const extraImages$ = this.uploadExtraPhotos();
 
     forkJoin([mainImage$, extraImages$]).subscribe({
-      next: ([mainImageUrl, extraImages]) => {
-        this.submitForm(mainImageUrl, extraImages);
+      next: ([mainImageUrl, newExtraImages]) => {
+        const allExtraImages=[
+          ...this.extraImages,
+          ...newExtraImages
+        ];
+        this.submitForm(mainImageUrl,allExtraImages);
       },
       error: err => {
         console.error('Upload failed', err);
