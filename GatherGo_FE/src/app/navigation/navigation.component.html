@@ -1,41 +1,100 @@
 <nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="header-content">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
 
-      <!-- Logo / Brand -->
-      <div class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center">
-          <span class="material-icons text-white text-2xl">place</span>
+      <!-- Logo -->
+      <button (click)="goToHome()" class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6 text-white"
+            >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+
+          <h1 class="text-4xl text-gray-800 leading-none mt-3">GatherGo</h1>
         </div>
-        <h1 class="text-3xl text-gray-800">GatherGo</h1>
-      </div>
+      </button>
 
-      <!-- Nav items -->
+      <!-- Navigation Items -->
       <div class="flex items-center gap-1">
-        <a
-          *ngFor="let item of navItems"
-          [routerLink]="item.link"
-          routerLinkActive="bg-teal-100 text-teal-700"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
-        >
-          <!-- Material icon for each nav item -->
-          <span class="material-icons">
-            {{ item.icon }}
-          </span>
-          <span class="hidden sm:inline">{{ item.label }}</span>
-        </a>
 
-        <!-- Logout button -->
-        <button
-          (click)="logout()"
-          class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors ml-2"
-        >
-          <span class="material-icons">logout</span>
-          <span class="hidden sm:inline">Logout</span>
-        </button>
+        <!-- Login/Register -->
+        <!-- <ng-container *ngIf="!isLoggedIn">
+          <button (click)="onNavigate('login')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 17l5-5-5-5v10z"/>
+            </svg>
+            <span class="hidden sm:inline">Login</span>
+          </button>
+          <button (click)="onNavigate('register')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2v20m10-10H2"/>
+            </svg>
+            <span class="hidden sm:inline">Register</span>
+          </button>
+        </ng-container> -->
+        <ng-container *ngIf="!isLoggedIn">
+                <button
+                    (click)="onNavigate('login')"
+                    class="nav-btn nav-login"
+                >
+                    Login
+                </button>
+                <button
+                    (click)="onNavigate('register')"
+                    class="nav-btn nav-register"
+                >
+                    Register
+                </button>
+            </ng-container>
+
+        <!-- Profile/Logout -->
+        <ng-container *ngIf="isLoggedIn">
+          <ng-container *ngFor="let item of navItems">
+            <button
+              (click)="onNavigate(item.link)"
+              class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-teal-100 transition-colors"
+            >
+              <img
+                [src]="item.icon"
+                class="w-5 h-5 text-gray-400"
+                alt="{{ item.label }} icon"
+              />
+              <span class="hidden sm:inline">{{ item.label }}</span>
+            </button>
+        </ng-container>
+
+          <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+            <img
+                [src]="ICONS.logout"
+                class="w-5 h-5 text-gray-700"
+                alt="logout icon"
+              />
+            <span class="hidden sm:inline">Logout</span>
+          </button>
+          <!-- <button (click)="logout()"
+                  class="nav-btn nav-logout">
+                  <img
+                [src]="ICONS.logout"
+                class="w-5 h-5 text-gray-700"
+                alt="logout icon"
+              />
+                    Logout
+                </button> -->
+        </ng-container>
       </div>
-
+      </div>
     </div>
   </div>
 </nav>

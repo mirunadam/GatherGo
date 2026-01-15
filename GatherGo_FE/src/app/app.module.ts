@@ -20,15 +20,7 @@ import {GoogleMapsModule} from "@angular/google-maps";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { FeatureTripListComponent } from './trips/feature-trip-list/feature-trip-list.component';
 import { TripViewCardComponent } from './trips/feature-trip-list/trip-view-card/trip-view-card.component';
-import { 
-  LucideAngularModule, 
-  MapPin, 
-  LayoutDashboard, 
-  Mail, 
-  User, 
-  LogOut, 
-  Shield 
-} from 'lucide-angular';
+import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -56,14 +48,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     CommonModule,
     RouterModule,
     FeatureTripListComponent,
-    LucideAngularModule.pick({ 
-      MapPin, 
-      LayoutDashboard, 
-      Mail, 
-      User, 
-      LogOut, 
-      Shield 
-    }),
+    MatIconModule
   ],
   providers: [], //ask daca mai trebe pus ceva aici
   bootstrap: [AppComponent]
