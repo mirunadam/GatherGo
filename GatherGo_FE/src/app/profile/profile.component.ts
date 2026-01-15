@@ -3,10 +3,14 @@ import { ProfileService } from '../services/profile.service';
 import { Router } from '@angular/router';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FileUploadService } from '../services/file-upload.service';
+// import { FormsModule } from '@angular/forms';
+// import { CommonModule, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
+  // standalone: true,
+  // imports: [FormsModule, CommonModule, NgIf],
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {

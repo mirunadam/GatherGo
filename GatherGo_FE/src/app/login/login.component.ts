@@ -4,12 +4,26 @@ import { Component } from '@angular/core';
 import { AuthService, LoginPayload } from '../services/auth.service';
 //Angular's navigation system
 import { Router } from '@angular/router';
+// import { NgFor, NgIf } from '@angular/common';
+// //import { NgModel } from '@angular/forms';
+// import { NgClass } from '@angular/common';
+// import { FormsModule } from '@angular/forms'
+// import { GoogleAuthProvider } from "firebase/auth";
+// import { Auth, signInWithPopup } from "@angular/fire/auth";
+// import { HttpClient } from "@angular/common/http";
 
 @Component({
   //this is an HTML tag special for this component
   selector: 'app-login',
   //points to the html file for this component
   templateUrl: './login.component.html',
+  // standalone: true,
+  // imports: [
+  //   NgFor,
+  //   NgIf,
+  //   FormsModule,
+  //   NgClass,
+  // ],
   //points to the scss file,styles are only for this component
   styleUrls: ['./login.component.scss']
 })
