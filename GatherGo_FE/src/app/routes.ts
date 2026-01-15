@@ -3,6 +3,7 @@ import {HomeComponent} from "./home/home.component";
 import {LoginComponent} from "./login/login.component";
 import {RegisterComponent} from "./register/register.component";
 import { ProfileComponent } from "./profile/profile.component";
+import { InvitationsComponent } from "./invitations/invitations.component";
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, //redirectTo: '/login', pathMatch: 'full'
@@ -16,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'trip/form',
     loadComponent: () => import('./trips/feature-create-trip/trip-form/trip-form.component').then(m => m.TripFormComponent)
+  },
+  {
+    path:'invitations',
+    component: InvitationsComponent
   }
   
 ];

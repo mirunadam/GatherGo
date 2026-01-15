@@ -101,6 +101,7 @@ export class TripFormComponent implements OnInit {
           participants: res.participants
         })
         this.imagePreviewUrl = res.imageURL;
+        this.extraImages=res.imageURLs ?? [];
         this.location = {
           lat: res.location?.latitude ?? 0,
           lng: res.location?.longitude ?? 0
@@ -187,7 +188,9 @@ export class TripFormComponent implements OnInit {
   }
 
   private uploadExtraPhotos():Observable<string[]>{
-      if (this.multipleFiles.length === 0) return of([]);
+      if (this.multipleFiles.length === 0) {
+        return of(this.extraImages);
+      }
 
       const observables = this.multipleFiles.map(file => {
         const formData = new FormData();
@@ -221,8 +224,8 @@ export class TripFormComponent implements OnInit {
       maxPeople: this.tripForm.value.maxPeople,
       itinerary: this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
-      imageURL: mainImageUrl,
-      imageURLs: extraImages,
+      imageURL: mainImageUrl ?? this.imagePreviewUrl,
+      imageURLs: extraImages ?? this.extraImages,
       isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
       participants: this.tripForm.value.participants ?? []
     }
