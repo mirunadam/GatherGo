@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { AuthService, LoginPayload } from '../services/auth.service';
 import { Router } from '@angular/router';
-
+// import { NgFor, NgIf } from '@angular/common';
+// //import { NgModel } from '@angular/forms';
+// import { NgClass } from '@angular/common';
+// import { FormsModule } from '@angular/forms'
 // import { GoogleAuthProvider } from "firebase/auth";
 // import { Auth, signInWithPopup } from "@angular/fire/auth";
 // import { HttpClient } from "@angular/common/http";
@@ -9,6 +12,13 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
+  // standalone: true,
+  // imports: [
+  //   NgFor,
+  //   NgIf,
+  //   FormsModule,
+  //   NgClass,
+  // ],
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
