@@ -101,6 +101,8 @@ export class TripFormComponent implements OnInit {
           participants: res.participants
         })
         this.imagePreviewUrl = res.imageURL;
+        this.extraImages=res.imageURLs ?? [];
+        this.multipleImagePreviewUrls=[...this.extraImages];
         this.location = {
           lat: res.location?.latitude ?? 0,
           lng: res.location?.longitude ?? 0
@@ -147,12 +149,8 @@ export class TripFormComponent implements OnInit {
     const extraImages$ = this.uploadExtraPhotos();
 
     forkJoin([mainImage$, extraImages$]).subscribe({
-      next: ([mainImageUrl, newExtraImages]) => {
-        const allExtraImages=[
-          ...this.extraImages,
-          ...newExtraImages
-        ];
-        this.submitForm(mainImageUrl,allExtraImages);
+      next: ([mainImageUrl, finalExtraImages]) => {
+        this.submitForm(mainImageUrl,finalExtraImages);
       },
       error: err => {
         console.error('Upload failed', err);
@@ -187,7 +185,9 @@ export class TripFormComponent implements OnInit {
   }
 
   private uploadExtraPhotos():Observable<string[]>{
-      if (this.multipleFiles.length === 0) return of([]);
+      if (this.multipleFiles.length === 0){
+        return of(this.extraImages);
+      }
 
       const observables = this.multipleFiles.map(file => {
         const formData = new FormData();
