@@ -39,3 +39,6 @@ $my-theme: mat.define-light-theme((
     color: whitesmoke !important;
     background-color: darkcyan !important;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

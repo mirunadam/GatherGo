@@ -19,6 +19,10 @@ import {GoogleMapsModule} from "@angular/google-maps";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { FeatureTripListComponent } from './trips/feature-trip-list/feature-trip-list.component';
 import { TripViewCardComponent } from './trips/feature-trip-list/trip-view-card/trip-view-card.component';
+import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { NavigationComponent } from './navigation/navigation.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +31,7 @@ import { TripViewCardComponent } from './trips/feature-trip-list/trip-view-card/
     RegisterComponent,
     HomeComponent,
     ProfileComponent,
+    NavigationComponent,
   ],
   imports: [
     BrowserModule,
@@ -39,7 +44,10 @@ import { TripViewCardComponent } from './trips/feature-trip-list/trip-view-card/
     BrowserAnimationsModule,
     TripViewCardComponent,
     TripFormComponent,
+    CommonModule,
+    RouterModule,
     FeatureTripListComponent,
+    MatIconModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
   ],

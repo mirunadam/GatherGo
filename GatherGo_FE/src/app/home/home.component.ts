@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
-
+// import { NgFor, NgIf } from '@angular/common';
+// import { NgModel } from '@angular/forms';
+// import { NgClass } from '@angular/common';
+// import { FormsModule } from '@angular/forms'
 
 // The simple interface your Landing Page HTML expects
 interface FrontendTrip {
@@ -32,6 +35,12 @@ const STATIC_TRIPS: FrontendTrip[] = [
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  // standalone: true,
+  // imports: [
+  //   NgFor,
+  //   NgIf,
+  //   FormsModule,
+  // ],
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
