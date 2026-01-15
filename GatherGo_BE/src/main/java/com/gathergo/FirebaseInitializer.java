@@ -11,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 @Service
 public class FirebaseInitializer {
-    @PostConstruct
     public static void initialize() {
         try {
 //            FileInputStream serviceAccount =
