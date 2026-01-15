@@ -25,6 +25,7 @@ export interface LoginPayload {
   providedIn: 'root'
 })
 export class AuthService {
+  //direct connection to AuthController
   private baseUrl = 'http://localhost:8080/auth';
 
   // private auth = inject(Auth);
@@ -40,6 +41,7 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/register`, data, { responseType: 'text' });
   }
 
+  //Send { email, password } to POST /auth/login and give me the response later”
   login(data: LoginPayload): Observable<any> {
     return this.http.post(`${this.baseUrl}/login`, data).pipe(
        map(res => {
@@ -114,7 +116,7 @@ export class AuthService {
   });
   localStorage.clear();
 }
-
+}
 
   // ✅ New unified Google Login method
   // googleLogin(): Observable<any> {
@@ -190,4 +192,4 @@ export class AuthService {
   //   })
   // );
   // }
-}
+

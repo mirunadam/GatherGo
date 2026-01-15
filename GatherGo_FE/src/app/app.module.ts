@@ -6,15 +6,14 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { FormsModule } from '@angular/forms';
-// import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-//import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
 
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { HomeComponent } from './home/home.component';
 import { ProfileComponent } from './profile/profile.component';
-//import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { TripFormComponent } from './trips/feature-create-trip/trip-form/trip-form.component';
 import {GoogleMapsModule} from "@angular/google-maps";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -48,9 +47,11 @@ import { NavigationComponent } from './navigation/navigation.component';
     CommonModule,
     RouterModule,
     FeatureTripListComponent,
-    MatIconModule
+    MatIconModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
   ],
-  providers: [], //ask daca mai trebe pus ceva aici
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

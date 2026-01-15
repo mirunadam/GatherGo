@@ -11,6 +11,7 @@
         <app-trip-view-card
           [trip]="tripWithCity.trip"
           [address]="tripWithCity.city"
+          (onEditClick)="goToEdit($event)"
         ></app-trip-view-card>
       </div>
     </div>

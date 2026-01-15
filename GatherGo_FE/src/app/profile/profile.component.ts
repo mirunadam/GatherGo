@@ -165,7 +165,7 @@ private saveProfileData(photoUrl: string | null): void {
   //       const storage = getStorage();
   //       const fileRef = ref(storage, `profile_pictures/${this.user.uid}`);
   //       const snapshot = await uploadBytes(fileRef, this.selectedFile);
-  //       finalPhotoUrl = await getDownloadURL(snapshot.ref); // ✅ This is a real HTTPS URL
+  //       finalPhotoUrl = await getDownloadURL(snapshot.ref); // This is a real HTTPS URL
   //     }
 
   //     // 2. Prepare the payload with the REAL URL
@@ -176,7 +176,7 @@ private saveProfileData(photoUrl: string | null): void {
   //       email: this.user.email,
   //       phone: this.user.phone,
   //       password: this.showPasswordFields ? this.passwords.new : null,
-  //       profilePictureUrl: finalPhotoUrl // ✅ No longer a giant Base64 string
+  //       profilePictureUrl: finalPhotoUrl // No longer a giant Base64 string
   //     };
 
   //     // 3. Send to Spring Boot

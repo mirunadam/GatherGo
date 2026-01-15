@@ -3,10 +3,13 @@ package com.gathergo.trips.dto;
 import com.gathergo.shared.dto.CurrencyCode;
 import com.gathergo.shared.dto.PointDTO;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TripDTO {
     private String uuid;
+    private String ownerEmail;
     private PointDTO location;
     private Date dateStart;
     private Date dateEnd;
@@ -15,7 +18,11 @@ public class TripDTO {
     private int maxPeople;
     private String itinerary;
     private String accommodation;
-    private String imageURL;
+    private String imageURL;//main trip Image
+    private boolean isPublic;
+    //Mara
+    private List<String> imageURLs;
+    private ArrayList<String> participants;
 
     public TripDTO() {
 
@@ -99,5 +106,49 @@ public class TripDTO {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getOwnerEmail() {
+        return ownerEmail;
+    }
+
+    public void setOwnerEmail(String ownerEmail) {
+        this.ownerEmail = ownerEmail;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public ArrayList<String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(ArrayList<String> participants) {
+        this.participants = participants;
+    }
+
+    public boolean containsParticipant(String participant) {
+        return this.participants != null && this.participants.contains(participant);
+    }
+
+    public void addParticipant(String participant) {
+        if(participants == null) {
+            participants = new ArrayList<>();
+        }
+        participants.add(participant);
+    }
+
+    //Mara
+    public List<String> getImageURLs(){
+        return imageURLs;
+    }
+
+    public void setImageURLs(List<String> imageURLs){
+        this.imageURLs=imageURLs;
     }
 }

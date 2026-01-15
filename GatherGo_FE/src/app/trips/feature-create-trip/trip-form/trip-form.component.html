@@ -68,7 +68,7 @@
         <div class="d-md-flex gap-3">
           <div>
             <h5>Destination</h5>
-            <google-map [center]="center" [zoom]="zoom" (mapClick)="setLocation($event)">
+            <google-map [center]="location ?? center" [zoom]="zoom" (mapClick)="setLocation($event)">
               <map-marker *ngIf="location" [position]="location"></map-marker>
             </google-map>
 
@@ -84,7 +84,7 @@
                 <input type="file" (change)="onFileSelected($event)" />
 
                 <div class="image-preview mt-2">
-                  <img *ngIf="selectedFile" [src]="imagePreviewUrl" alt=""/>
+                  <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl" alt=""/>
                 </div>
               </div>
             </div>
@@ -112,6 +112,36 @@
             Invalid budget value
           </mat-error>
         </mat-form-field>
+      </div>
+      
+      <div class="mt-3">
+        <div>Add extra photos</div>
+        <input type="file" (change)="onMultipleFilesSelected($event)" multiple/>
+        <div cladd="d-flex flex-wrap gap-2 mt-2">
+          <div *ngFor="let url of multipleImagePreviewUrls; let i = index" class="image-preview-multi">
+            <img [src]="url" alt="Extra Photo"/>
+            <button type="button" class="btn-remove" (click)="removePhoto(i)">✕</button>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="userData?.role === UserRole.USER">
+        <div class="my-2">Visibility options</div>
+
+        <div class="d-md-flex gap-2 align-items-center">
+          <button class="w-100 my-2 visibility-button" [ngClass]="{'selected': tripForm.value.isPublic}" mat-button
+                  type="button" (click)="tripForm.patchValue({isPublic: true})" >
+            <div><mat-icon>public</mat-icon></div>
+            <div>Public</div>
+            <div class="subtext">Anyone can join the trip</div>
+          </button>
+          <button class="w-100 my-2 visibility-button" [ngClass]="{'selected': !tripForm.value.isPublic}" mat-button
+                  type="button" (click)="tripForm.patchValue({isPublic: false})">
+            <div><mat-icon>lock</mat-icon></div>
+            <div>Private</div>
+            <div class="subtext">Only people you invite can join the trip</div>
+          </button>
+        </div>
       </div>
 
       <button class="w-100 mt-2 btn-primary" type="submit" mat-button>
