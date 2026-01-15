@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
-
+// import { NgFor, NgIf } from '@angular/common';
+// import { NgModel } from '@angular/forms';
+// import { NgClass } from '@angular/common';
+// import { FormsModule } from '@angular/forms'
 
 // The simple interface your Landing Page HTML expects
 interface FrontendTrip {
@@ -32,6 +35,12 @@ const STATIC_TRIPS: FrontendTrip[] = [
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  // standalone: true,
+  // imports: [
+  //   NgFor,
+  //   NgIf,
+  //   FormsModule,
+  // ],
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
@@ -39,19 +48,19 @@ export class HomeComponent implements OnInit {
   // Google Maps Geocoder
   private geocoder = new google.maps.Geocoder();
 
+
   // State
   searchTerm: string = '';
   locationFilter: string = '';
   agencyFilter: string = '';
-  
   allTrips: FrontendTrip[] = [...STATIC_TRIPS]; // Start with static
   isLoggedIn = false;
   userName: string | null = null;
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private profileService: ProfileService,
-    private tripService: TripService 
+    private tripService: TripService
   ) { }
 
   ngOnInit(): void {
@@ -75,7 +84,6 @@ export class HomeComponent implements OnInit {
     // 1. Fetch Real Trips from Backend
     this.tripService.getAllTrips().subscribe({
       next: (dtos: TripDto[]) => {
-        
         // 2. Convert Backend DTOs to Frontend UI Models
         const mappedTrips = dtos.map(dto => this.mapTripDtoToFrontendModel(dto));
 
@@ -86,27 +94,23 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // Converts Complex DTO -> Simple UI Object 
   private mapTripDtoToFrontendModel(dto: TripDto): FrontendTrip {
-    
+
     // Create the base object
     const frontendTrip: FrontendTrip = {
       id: dto.uuid,
       name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
       location: 'Loading location...', // Placeholder while geocoding runs
-      agency: 'Community Trip', // Real trips don't have agencies yet
+      agency: 'Community Trip', 
       price: dto.budget || 0,
       period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
       imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
     };
 
-    // Trigger Async Geocoding (Smooth Update)
     if (dto.location && dto.location.latitude && dto.location.longitude) {
       const latLng = { lat: dto.location.latitude, lng: dto.location.longitude };
-      
       this.geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
-          // Update the specific trip's location string when data arrives
           frontendTrip.location = this.extractCityAndCountry(results[0]);
         } else {
           frontendTrip.location = 'Unknown Location';
@@ -119,14 +123,11 @@ export class HomeComponent implements OnInit {
     return frontendTrip;
   }
 
-  // --- Helpers ---
-
   private formatDatePeriod(start: Date | string | null | undefined, end: Date | string | null | undefined): string {
     if (!start || !end) return 'Flexible Dates';
     // Handle both String (ISO) and Date objects safely
     const s = new Date(start);
     const e = new Date(end);
-    
     const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
     return `${s.toLocaleDateString('en-US', options)} - ${e.toLocaleDateString('en-US', options)}`;
   }
@@ -147,15 +148,12 @@ export class HomeComponent implements OnInit {
     return city ? `${city}, ${country}` : country || 'Unknown Location';
   }
 
-  // --- Navigation & Filtering ---
-
   get filteredTrips(): FrontendTrip[] {
     return this.allTrips.filter(trip => {
       const search = this.searchTerm.toLowerCase();
       const locFilter = this.locationFilter.toLowerCase();
       const agFilter = this.agencyFilter.toLowerCase();
 
-      // Safe check in case fields are missing
       const n = trip.name ? trip.name.toLowerCase() : '';
       const l = trip.location ? trip.location.toLowerCase() : '';
       const a = trip.agency ? trip.agency.toLowerCase() : '';
@@ -172,10 +170,17 @@ export class HomeComponent implements OnInit {
     this.isLoggedIn = !!localStorage.getItem('idToken');
   }
 
-  onNavigate(path: string): void {
-    if (path === 'login' || path === 'register' || path === 'profile' || path === 'dashboard') {
-      this.router.navigate([`/${path}`]);
+  joinTrip(tripUuid: string) {
+    const email = localStorage.getItem('email');
+    if(email) {
+      this.tripService.addParticipantToTrip(tripUuid, email).subscribe((res) => {
+        console.log(res);
+      });
     }
+  }
+
+  onNavigate(path: string): void {
+    this.router.navigate([`/${path}`]);
   }
 
   logout(): void {
@@ -190,6 +195,5 @@ export class HomeComponent implements OnInit {
     this.agencyFilter = '';
   }
 
-  // Additional vars needed for your HTML bindings
   userEmail: string | null = null;
 }

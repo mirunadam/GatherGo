@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, from, switchMap, map } from 'rxjs';
-import { Auth, GoogleAuthProvider, signInWithPopup, getRedirectResult, UserCredential } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithPopup, getRedirectResult, UserCredential, authState } from '@angular/fire/auth';
 import firebase from 'firebase/compat/app';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { signal, computed } from '@angular/core';
+import { UserRole } from '../shared-domain/user-role.model';
 
 export interface RegisterPayload {
   role: 'USER' | 'AGENCY';
@@ -23,7 +25,15 @@ export interface LoginPayload {
   providedIn: 'root'
 })
 export class AuthService {
+  //direct connection to AuthController
   private baseUrl = 'http://localhost:8080/auth';
+
+  // private auth = inject(Auth);
+  // private http = inject(HttpClient);
+
+  // user$ = authState(this.auth);
+
+  userRole = signal<UserRole>((localStorage.getItem('role') as UserRole) || 'USER');
 
   constructor(private http: HttpClient, private afAuth: AngularFireAuth) {}
 
@@ -31,11 +41,33 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/register`, data, { responseType: 'text' });
   }
 
+  //Send { email, password } to POST /auth/login and give me the response later”
   login(data: LoginPayload): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, data);
+    return this.http.post(`${this.baseUrl}/login`, data).pipe(
+       map(res => {
+      this.handleAuthSuccess(res);
+      return res;
+    })
+    );
   }
 
     googleLogin(): Observable<any> {
+    //   const provider = new GoogleAuthProvider();
+    // provider.setCustomParameters({ prompt: 'select_account' });
+
+    // return from(signInWithPopup(this.auth, provider)).pipe(
+    //   switchMap(result => from(result.user.getIdToken())),
+    //   switchMap(idToken =>
+    //     this.http.post(`${this.baseUrl}/google`, idToken, {
+    //       headers: { 'Content-Type': 'application/json' }
+    //     })
+    //   ),
+    //   map(res => {
+    //     this.handleAuthSuccess(res);
+    //     return res;
+    //   }));
+
+    //Previous version
     const provider = new firebase.auth.GoogleAuthProvider();
     
     // Use the compatibility signInWithPopup method from AngularFireAuth
@@ -54,6 +86,37 @@ export class AuthService {
       })
     );
   }
+
+  private handleAuthSuccess(res: any) {
+  if (res?.role) {
+    // res.role will be "USER" or "AGENCY" from your AuthResponse DTO
+    this.userRole.set(res.role);
+    localStorage.setItem('role', res.role);
+  }
+  }
+
+  logout(): void {
+    // this.auth.signOut();
+    // localStorage.clear();
+    // this.userRole.set('USER');
+
+  //Clear backend/session-related storage
+  localStorage.removeItem('idToken');
+  localStorage.removeItem('uid');
+  localStorage.removeItem('email');
+  localStorage.removeItem('username');
+  localStorage.removeItem('role');
+
+  // Reset role signal
+  this.userRole.set(UserRole.USER);
+
+  // // Sign out from Firebase (Google login)
+  this.afAuth.signOut().catch(() => {
+    // ignore errors – user may not be logged in with Google
+  });
+  localStorage.clear();
+}
+}
 
   // ✅ New unified Google Login method
   // googleLogin(): Observable<any> {
@@ -129,4 +192,4 @@ export class AuthService {
   //   })
   // );
   // }
-}
+

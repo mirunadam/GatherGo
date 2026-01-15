@@ -3,10 +3,14 @@ import { ProfileService } from '../services/profile.service';
 import { Router } from '@angular/router';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FileUploadService } from '../services/file-upload.service';
+// import { FormsModule } from '@angular/forms';
+// import { CommonModule, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
+  // standalone: true,
+  // imports: [FormsModule, CommonModule, NgIf],
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
@@ -161,7 +165,7 @@ private saveProfileData(photoUrl: string | null): void {
   //       const storage = getStorage();
   //       const fileRef = ref(storage, `profile_pictures/${this.user.uid}`);
   //       const snapshot = await uploadBytes(fileRef, this.selectedFile);
-  //       finalPhotoUrl = await getDownloadURL(snapshot.ref); // ✅ This is a real HTTPS URL
+  //       finalPhotoUrl = await getDownloadURL(snapshot.ref); // This is a real HTTPS URL
   //     }
 
   //     // 2. Prepare the payload with the REAL URL
@@ -172,7 +176,7 @@ private saveProfileData(photoUrl: string | null): void {
   //       email: this.user.email,
   //       phone: this.user.phone,
   //       password: this.showPasswordFields ? this.passwords.new : null,
-  //       profilePictureUrl: finalPhotoUrl // ✅ No longer a giant Base64 string
+  //       profilePictureUrl: finalPhotoUrl // No longer a giant Base64 string
   //     };
 
   //     // 3. Send to Spring Boot

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-//@Service
+@Service
 public class FirebaseInitializer {
-    //@PostConstruct
+    @PostConstruct
     public static void initialize() {
         try {
 //            FileInputStream serviceAccount =
@@ -31,7 +31,7 @@ public class FirebaseInitializer {
                     .build();
 
             FirebaseApp.initializeApp(options);
-            System.out.println("✅ Firebase initialized successfully");
+            System.out.println("Firebase initialized successfully");
         } catch (Exception e) {
             e.printStackTrace();
         }
