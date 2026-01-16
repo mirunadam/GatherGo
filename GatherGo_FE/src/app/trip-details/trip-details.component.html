@@ -1,101 +1,315 @@
+<app-navigation></app-navigation>
 <div class="max-w-7xl mx-auto px-4 py-8">
 
-  <!-- Back -->
-  <button
-    (click)="goBack()"
-    class="mb-6 text-teal-600 hover:text-teal-700 flex items-center gap-2"
-  >
-    ← Back to Dashboard
-  </button>
+  <!-- Loading / Error -->
+  <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <p class="text-gray-600">Loading trip details...</p>
+  </div>
 
-  <!-- Hero -->
-  <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-    <img
-      *ngIf="trip.imageUrl"
-      [src]="trip.imageUrl"
-      class="w-full h-64 md:h-96 object-cover"
-    />
+  <div *ngIf="!isLoading && errorMsg" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <p class="text-red-600">{{ errorMsg }}</p>
+    <button
+      (click)="goBack()"
+      class="mt-4 text-teal-600 hover:text-teal-700"
+    >
+      ← Back
+    </button>
+  </div>
 
-    <div class="p-8">
-      <h1 class="text-4xl text-gray-800 mb-4">{{ trip.name }}</h1>
+  <!-- Main Content -->
+  <ng-container *ngIf="!isLoading && trip as t">
 
-      <div class="grid md:grid-cols-3 gap-4">
-        <div>
-          <p class="text-sm text-gray-600">Location</p>
-          <p class="text-gray-800">{{ trip.location }}</p>
+    <!-- Back -->
+    <button
+      (click)="goBack()"
+      class="mb-6 text-teal-600 hover:text-teal-700 flex items-center gap-2"
+    >
+      ← Go Back
+    </button>
+
+    <!-- Hero -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+      <img
+        *ngIf="t.imageURL"
+        [src]="t.imageURL"
+        class="w-full h-64 md:h-96 object-cover"
+        alt="Trip cover"
+      />
+
+      <div class="p-8">
+        <!-- Title: TripDto doesn't show a "name" in your snippet, so we show city or owner as fallback -->
+        <h1 class="text-4xl text-gray-800 mb-4">
+          Trip
+          <span class="text-gray-500 text-xl font-normal" *ngIf="t.ownerEmail">
+            ({{ t.ownerEmail }})
+          </span>
+        </h1>
+
+        <div class="grid md:grid-cols-3 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Dates</p>
+            <p class="text-gray-800">
+              {{ t.dateStart | date }} - {{ t.dateEnd | date }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-600">Budget</p>
+            <p class="text-gray-800">
+              {{ t.budget }} {{ t.currency }}
+              <span class="text-gray-500" *ngIf="t.budget">/ person</span>
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-600">Max people</p>
+            <p class="text-gray-800">
+              {{ t.maxPeople ?? '-' }}
+            </p>
+          </div>
         </div>
-        <div>
-          <p class="text-sm text-gray-600">Dates</p>
-          <p class="text-gray-800">
-            {{ trip.startDate | date }} - {{ trip.endDate | date }}
+
+        <!-- Location Coordinates if present -->
+        <div class="mt-6">
+          <p class="text-sm text-gray-600">Location</p>
+
+            <p class="text-gray-800">
+              {{ locationName }}
+              <span class="text-gray-500" *ngIf="t.location">
+                ({{ t.location.latitude }}, {{ t.location.longitude }})
+              </span>
           </p>
         </div>
-        <div>
-          <p class="text-sm text-gray-600">Budget</p>
-          <p class="text-gray-800">${{ trip.budget }} / person</p>
+
+        <!-- Visibility -->
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+        <div class="mt-4">
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm"
+            [ngClass]="t.isPublic ? 'bg-teal-50 text-teal-700' : 'bg-gray-100 text-gray-700'"
+          >
+            {{ t.isPublic ? 'Public trip' : 'Private trip' }}
+          </span>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Tabs -->
-  <div class="bg-white rounded-2xl shadow-xl">
-    <div class="border-b flex">
-      <button
-        *ngFor="let tab of tabs"
-        (click)="activeTab = tab"
-        class="px-6 py-4 capitalize"
-        [class.border-b-2]="activeTab === tab"
-        [class.text-teal-600]="activeTab === tab"
-      >
-        {{ tab }}
-      </button>
-    </div>
-
-    <div class="p-8">
-
-      <!-- OVERVIEW -->
-      <div *ngIf="activeTab === 'overview'">
-        <h3 class="text-xl mb-2">Itinerary</h3>
-        <div class="bg-gray-50 p-4 rounded">{{ trip.itinerary }}</div>
-      </div>
-
-      <!-- ACTIVITIES -->
-      <div *ngIf="activeTab === 'activities'">
         <button
-          (click)="showActivityForm = !showActivityForm"
-          class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
-        >
-          Add Activity
-        </button>
-
-        <form *ngIf="showActivityForm" (ngSubmit)="addActivity()" class="space-y-3">
-          <input [(ngModel)]="newActivity.name" name="name" placeholder="Name" class="input" />
-          <textarea [(ngModel)]="newActivity.description" name="desc" placeholder="Description"></textarea>
-          <input type="date" [(ngModel)]="newActivity.date" name="date" />
-          <input type="time" [(ngModel)]="newActivity.time" name="time" />
-          <button class="bg-teal-500 text-white px-4 py-2 rounded">Save</button>
-        </form>
-
-        <div *ngFor="let a of activities" class="bg-gray-50 p-4 rounded mt-3">
-          <h4 class="text-lg">{{ a.name }}</h4>
-          <p class="text-gray-600">{{ a.description }}</p>
+              (click)="joinTrip(trip.uuid)"
+              class="px-4 py-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all"
+            >
+              Join Trip
+            </button>
         </div>
       </div>
-
-      <!-- PARTICIPANTS -->
-      <div *ngIf="activeTab === 'participants'">
-        <div *ngFor="let p of mockParticipants" class="flex items-center gap-4 bg-gray-50 p-4 rounded">
-          <div class="w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center">
-            {{ p.name[0] }}
-          </div>
-          <div>
-            <p>{{ p.name }}</p>
-            <p class="text-sm text-gray-500">{{ p.email }}</p>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-2xl shadow-xl">
+      <div class="border-b flex flex-wrap">
+        <button
+          *ngFor="let tab of tabs"
+          (click)="activeTab = tab"
+          class="px-6 py-4 capitalize"
+          [class.border-b-2]="activeTab === tab"
+          [class.text-teal-600]="activeTab === tab"
+        >
+          {{ tab }}
+        </button>
+      </div>
+
+      <div class="p-8">
+
+        <!-- OVERVIEW -->
+        <div *ngIf="activeTab === 'overview'">
+          <h3 class="text-xl mb-2">Itinerary</h3>
+          <div class="bg-gray-50 p-4 rounded">
+            {{ t.itinerary || 'No itinerary added yet.' }}
+          </div>
+
+          <h3 class="text-xl mt-6 mb-2">Accommodation</h3>
+          <div class="bg-gray-50 p-4 rounded">
+            {{ t.accommodation || 'No accommodation added yet.' }}
+          </div>
+
+          <h3 class="text-xl mt-6 mb-2">Participants (emails)</h3>
+          <div class="bg-gray-50 p-4 rounded">
+            <ng-container *ngIf="t.participants?.length; else noParticipants">
+              <ul class="list-disc pl-5 space-y-1">
+                <li *ngFor="let email of t.participants">{{ email }}</li>
+              </ul>
+            </ng-container>
+            <ng-template #noParticipants>
+              <p class="text-gray-600">No participants yet.</p>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- ACTIVITIES (local UI mock for now) -->
+        <div *ngIf="activeTab === 'activities'">
+          <button
+            (click)="showActivityForm = !showActivityForm"
+            class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
+          >
+            {{ showActivityForm ? 'Close' : 'Add Activity' }}
+          </button>
+
+          <form *ngIf="showActivityForm" (ngSubmit)="addActivity()" class="space-y-3">
+            <input
+              [(ngModel)]="newActivity.name"
+              name="name"
+              placeholder="Name"
+              class="w-full border rounded px-3 py-2"
+              required
+            />
+
+            <textarea
+              [(ngModel)]="newActivity.description"
+              name="desc"
+              placeholder="Description"
+              class="w-full border rounded px-3 py-2"
+              rows="3"
+            ></textarea>
+
+            <div class="flex flex-col md:flex-row gap-3">
+              <input type="date" [(ngModel)]="newActivity.date" name="date" class="border rounded px-3 py-2" />
+              <input type="time" [(ngModel)]="newActivity.time" name="time" class="border rounded px-3 py-2" />
+            </div>
+
+            <button class="bg-teal-500 text-white px-4 py-2 rounded">Save</button>
+          </form>
+
+          <div *ngIf="!activities.length" class="text-gray-600 mt-4">
+            No activities yet.
+          </div>
+
+          <div *ngFor="let a of activities" class="bg-gray-50 p-4 rounded mt-3">
+            <h4 class="text-lg">{{ a.name }}</h4>
+            <p class="text-gray-600">{{ a.description }}</p>
+            <p class="text-sm text-gray-500" *ngIf="a.date || a.time">
+              {{ a.date }} {{ a.time }}
+            </p>
+          </div>
+        </div>
+
+        <!-- ACCOMMODATIONS (local UI mock for now) -->
+        <div *ngIf="activeTab === 'accommodations'">
+          <button
+            (click)="showAccommodationForm = !showAccommodationForm"
+            class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
+          >
+            {{ showAccommodationForm ? 'Close' : 'Add Accommodation' }}
+          </button>
+
+          <form *ngIf="showAccommodationForm" (ngSubmit)="addAccommodation()" class="space-y-3">
+            <input
+              [(ngModel)]="newAccommodation.name"
+              name="accName"
+              placeholder="Name"
+              class="w-full border rounded px-3 py-2"
+              required
+            />
+
+            <input
+              [(ngModel)]="newAccommodation.address"
+              name="address"
+              placeholder="Address"
+              class="w-full border rounded px-3 py-2"
+            />
+
+            <div class="flex flex-col md:flex-row gap-3">
+              <input type="date" [(ngModel)]="newAccommodation.checkIn" name="checkIn" class="border rounded px-3 py-2" />
+              <input type="date" [(ngModel)]="newAccommodation.checkOut" name="checkOut" class="border rounded px-3 py-2" />
+              <input type="number" [(ngModel)]="newAccommodation.price" name="price" class="border rounded px-3 py-2" placeholder="Price" />
+            </div>
+
+            <button class="bg-teal-500 text-white px-4 py-2 rounded">Save</button>
+          </form>
+
+          <div *ngIf="!accommodations.length" class="text-gray-600 mt-4">
+            No accommodations yet.
+          </div>
+
+          <div *ngFor="let a of accommodations" class="bg-gray-50 p-4 rounded mt-3">
+            <h4 class="text-lg">{{ a.name }}</h4>
+            <p class="text-gray-600">{{ a.address }}</p>
+            <p class="text-sm text-gray-500">
+              Check-in: {{ a.checkIn || '-' }} • Check-out: {{ a.checkOut || '-' }}
+            </p>
+            <p class="text-sm text-gray-700" *ngIf="a.price">
+              Price: {{ a.price }}
+            </p>
+          </div>
+        </div>
+
+        <!-- PHOTOS -->
+        <div *ngIf="activeTab === 'photos'">
+          <h3 class="text-xl mb-4">Photos</h3>
+
+          <!-- Extra images saved in TripDto.imageURLs -->
+          <div *ngIf="t.imageURLs?.length; else noPhotos" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div *ngFor="let img of t.imageURLs" class="bg-gray-50 rounded overflow-hidden">
+              <img [src]="img" class="w-full h-48 object-cover" alt="Trip photo" />
+              <div class="p-3">
+                <p class="text-sm text-gray-600 break-all">{{ img }}</p>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noPhotos>
+            <p class="text-gray-600">No photos uploaded yet.</p>
+          </ng-template>
+
+          <!-- Optional: if you also have photos[] with like support -->
+          <div *ngIf="photos.length" class="mt-8">
+            <h4 class="text-lg mb-2">Interactive photos</h4>
+            <div *ngFor="let p of photos" class="bg-gray-50 p-4 rounded mt-3">
+              <div class="flex items-center justify-between">
+                <p class="text-gray-800">{{ p.caption || 'Photo' }}</p>
+                <button
+                  (click)="toggleLike(p.id)"
+                  class="px-3 py-1 rounded"
+                  [ngClass]="likedPhotos.has(p.id) ? 'bg-teal-500 text-white' : 'bg-white border text-gray-700'"
+                >
+                  {{ likedPhotos.has(p.id) ? 'Liked' : 'Like' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARTICIPANTS -->
+        <div *ngIf="activeTab === 'participants'">
+          <h3 class="text-xl mb-4">Participants</h3>
+
+          <!-- Show real participant emails if available -->
+          <div *ngIf="t.participants?.length; else mockList" class="space-y-3">
+            <div *ngFor="let email of t.participants" class="flex items-center gap-4 bg-gray-50 p-4 rounded">
+              <div class="w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center">
+                {{ email[0] }}
+              </div>
+              <div>
+                <p class="font-medium">{{ email }}</p>
+                <p class="text-sm text-gray-500">Participant</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- fallback mock -->
+          <ng-template #mockList>
+            <div class="space-y-3">
+              <div *ngFor="let p of mockParticipants" class="flex items-center gap-4 bg-gray-50 p-4 rounded">
+                <div class="w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center">
+                  {{ p.name[0] }}
+                </div>
+                <div>
+                  <p class="font-medium">{{ p.name }}</p>
+                  <p class="text-sm text-gray-500">{{ p.email }}</p>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
 </div>

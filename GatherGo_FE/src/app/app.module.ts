@@ -24,6 +24,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
 import { TripDetailsComponent } from './trip-details/trip-details.component';
+import { NavigationModule } from './navigation/navigation.module';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,6 @@ import { TripDetailsComponent } from './trip-details/trip-details.component';
     RegisterComponent,
     HomeComponent,
     ProfileComponent,
-    NavigationComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,8 +52,9 @@ import { TripDetailsComponent } from './trip-details/trip-details.component';
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     TripDetailsComponent,
+    NavigationModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

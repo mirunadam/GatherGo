@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
+import { NavigationModule } from '../navigation/navigation.module';
 // import { NgFor, NgIf } from '@angular/common';
 // import { NgModel } from '@angular/forms';
 // import { NgClass } from '@angular/common';
@@ -182,6 +183,10 @@ export class HomeComponent implements OnInit {
   onNavigate(path: string): void {
     this.router.navigate([`/${path}`]);
   }
+
+  onNavigateToTripDetails(uuid: string) {
+  this.router.navigate(['trip', uuid]);
+}
 
   logout(): void {
     localStorage.clear();
