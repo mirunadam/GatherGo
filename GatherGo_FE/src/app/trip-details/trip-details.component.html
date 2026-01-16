@@ -1,0 +1,101 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- Back -->
+  <button
+    (click)="goBack()"
+    class="mb-6 text-teal-600 hover:text-teal-700 flex items-center gap-2"
+  >
+    ← Back to Dashboard
+  </button>
+
+  <!-- Hero -->
+  <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+    <img
+      *ngIf="trip.imageUrl"
+      [src]="trip.imageUrl"
+      class="w-full h-64 md:h-96 object-cover"
+    />
+
+    <div class="p-8">
+      <h1 class="text-4xl text-gray-800 mb-4">{{ trip.name }}</h1>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <p class="text-sm text-gray-600">Location</p>
+          <p class="text-gray-800">{{ trip.location }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Dates</p>
+          <p class="text-gray-800">
+            {{ trip.startDate | date }} - {{ trip.endDate | date }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Budget</p>
+          <p class="text-gray-800">${{ trip.budget }} / person</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-white rounded-2xl shadow-xl">
+    <div class="border-b flex">
+      <button
+        *ngFor="let tab of tabs"
+        (click)="activeTab = tab"
+        class="px-6 py-4 capitalize"
+        [class.border-b-2]="activeTab === tab"
+        [class.text-teal-600]="activeTab === tab"
+      >
+        {{ tab }}
+      </button>
+    </div>
+
+    <div class="p-8">
+
+      <!-- OVERVIEW -->
+      <div *ngIf="activeTab === 'overview'">
+        <h3 class="text-xl mb-2">Itinerary</h3>
+        <div class="bg-gray-50 p-4 rounded">{{ trip.itinerary }}</div>
+      </div>
+
+      <!-- ACTIVITIES -->
+      <div *ngIf="activeTab === 'activities'">
+        <button
+          (click)="showActivityForm = !showActivityForm"
+          class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
+        >
+          Add Activity
+        </button>
+
+        <form *ngIf="showActivityForm" (ngSubmit)="addActivity()" class="space-y-3">
+          <input [(ngModel)]="newActivity.name" name="name" placeholder="Name" class="input" />
+          <textarea [(ngModel)]="newActivity.description" name="desc" placeholder="Description"></textarea>
+          <input type="date" [(ngModel)]="newActivity.date" name="date" />
+          <input type="time" [(ngModel)]="newActivity.time" name="time" />
+          <button class="bg-teal-500 text-white px-4 py-2 rounded">Save</button>
+        </form>
+
+        <div *ngFor="let a of activities" class="bg-gray-50 p-4 rounded mt-3">
+          <h4 class="text-lg">{{ a.name }}</h4>
+          <p class="text-gray-600">{{ a.description }}</p>
+        </div>
+      </div>
+
+      <!-- PARTICIPANTS -->
+      <div *ngIf="activeTab === 'participants'">
+        <div *ngFor="let p of mockParticipants" class="flex items-center gap-4 bg-gray-50 p-4 rounded">
+          <div class="w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center">
+            {{ p.name[0] }}
+          </div>
+          <div>
+            <p>{{ p.name }}</p>
+            <p class="text-sm text-gray-500">{{ p.email }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -16,6 +16,9 @@ export const routes: Routes = [
   {
     path: 'trip/form',
     loadComponent: () => import('./trips/feature-create-trip/trip-form/trip-form.component').then(m => m.TripFormComponent)
+  },
+  { path: 'trip/details',
+    loadComponent: ()=> import('./trip-details/trip-details.component').then(m=> m.TripDetailsComponent)
   }
   
 ];
