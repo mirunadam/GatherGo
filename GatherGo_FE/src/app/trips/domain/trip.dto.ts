@@ -4,6 +4,7 @@ import {CurrencyCode} from "../../shared-domain/currency-code-enum";
 export interface TripDto {
   uuid: string,
   ownerEmail: string | null | undefined,
+  name: string | null | undefined,
   location: PointDtoModel | null | undefined;
   dateStart: Date | null | undefined;
   dateEnd: Date | null | undefined;

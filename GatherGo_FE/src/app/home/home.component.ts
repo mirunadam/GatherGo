@@ -93,7 +93,7 @@ export class HomeComponent implements OnInit {
     // Create the base object
     const frontendTrip: FrontendTrip = {
       id: dto.uuid,
-      name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
+      name: dto.name || 'Unnamed Adventure',
       location: 'Loading location...', // Placeholder while geocoding runs
       agency: 'Community Trip',
       price: dto.budget || 0,
