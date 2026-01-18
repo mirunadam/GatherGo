@@ -10,6 +10,7 @@ import java.util.List;
 public class TripDTO {
     private String uuid;
     private String ownerEmail;
+    private String name;
     private PointDTO location;
     private Date dateStart;
     private Date dateEnd;
@@ -141,6 +142,14 @@ public class TripDTO {
 
     public void addParticipant(String participant) {
         getParticipants().add(participant);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     //Mara
