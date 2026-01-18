@@ -35,16 +35,10 @@ const STATIC_TRIPS: FrontendTrip[] = [
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  // standalone: true,
-  // imports: [
-  //   NgFor,
-  //   NgIf,
-  //   FormsModule,
-  // ],
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  
+
   // Google Maps Geocoder
   private geocoder = new google.maps.Geocoder();
 
@@ -101,7 +95,7 @@ export class HomeComponent implements OnInit {
       id: dto.uuid,
       name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
       location: 'Loading location...', // Placeholder while geocoding runs
-      agency: 'Community Trip', 
+      agency: 'Community Trip',
       price: dto.budget || 0,
       period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
       imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image

@@ -185,7 +185,7 @@ export class TripFormComponent implements OnInit {
   }
 
   private uploadExtraPhotos():Observable<string[]>{
-      if (this.multipleFiles.length === 0){
+      if (this.multipleFiles.length === 0) {
         return of(this.extraImages);
       }
 
@@ -221,8 +221,8 @@ export class TripFormComponent implements OnInit {
       maxPeople: this.tripForm.value.maxPeople,
       itinerary: this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
-      imageURL: mainImageUrl,
-      imageURLs: extraImages,
+      imageURL: mainImageUrl ?? this.imagePreviewUrl,
+      imageURLs: extraImages ?? this.extraImages,
       isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
       participants: this.tripForm.value.participants ?? []
     }

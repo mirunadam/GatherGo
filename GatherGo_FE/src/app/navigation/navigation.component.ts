@@ -53,6 +53,7 @@ export class NavigationComponent implements OnInit {
     return [
       { label: 'Dashboard', icon: this.ICONS.dashboard, link: '/dashboard' },
       { label: 'Create Trip', icon: this.ICONS.mapPin, link: '/trip/form' },
+      { label: 'View Trips', icon: this.ICONS.mapPin, link: '/trip'},
       { label: 'Invitations', icon: this.ICONS.mail, link: '/invitations' },
       { label: 'Profile', icon: this.ICONS.user, link: '/profile' },
     ];
