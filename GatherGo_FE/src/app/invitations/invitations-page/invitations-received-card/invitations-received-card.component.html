@@ -1,0 +1,41 @@
+<div class="card mt-3">
+  <div class="card-body p-4">
+
+    <div class="d-flex align-items-center mb-4">
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        ✉️
+      </div>
+      <div class="ms-2 h4 fw-normal mb-0">Received</div>
+    </div>
+
+    <div *ngIf="receivedInvites.length === 0" class="text-muted">
+      No invitations received.
+    </div>
+
+    <div *ngFor="let invite of receivedInvites" class="mb-3 p-3 border rounded">
+
+      <div class="fw-semibold mb-1">
+        Trip ID: {{ invite.tripId }}
+      </div>
+
+      <div class="text-muted mb-2">
+        From: {{ invite.senderEmail }}
+      </div>
+
+      <div class="d-flex gap-2" *ngIf="invite.status === InviteStatus.PENDING">
+        <button mat-button color="primary" (click)="accept(invite)">
+          Accept
+        </button>
+
+        <button mat-button color="warn" (click)="reject(invite)">
+          Reject
+        </button>
+      </div>
+
+      <div *ngIf="invite.status !== InviteStatus.PENDING" class="fw-semibold">
+        Status: {{ invite.status }}
+      </div>
+    </div>
+
+  </div>
+</div>
