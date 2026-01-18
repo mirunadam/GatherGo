@@ -37,4 +37,12 @@ export class TripService {
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }
+
+  public addParticipant(tripUuid: string, email: string) {
+  return this.http.post(
+    this.url + `/addParticipant?uuid=${tripUuid}&email=${email}`,
+    null
+  );
+}
+
 }

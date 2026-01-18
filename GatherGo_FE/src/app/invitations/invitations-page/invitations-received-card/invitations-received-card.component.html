@@ -1,39 +1,29 @@
 <div class="card mt-3">
   <div class="card-body p-4">
+    <h4 class="mb-3">Received Invitations</h4>
 
-    <div class="d-flex align-items-center mb-4">
-      <div class="ms-2 h4 fw-normal mb-0">
-        Received Invitations
-      </div>
-    </div>
-
-    <div *ngIf="invites.length === 0" class="text-muted">
+    <div *ngIf="invites.length === 0">
       You have no invitations.
     </div>
 
-    <div *ngFor="let invite of invites" class="invite-item mb-3 p-3 border rounded">
-
-      <div class="mb-2">
+    <div *ngFor="let invite of invites" class="invite-card mb-3">
+      <div>
         <strong>From:</strong> {{ invite.senderEmail }}
       </div>
-
-      <div class="mb-2">
+      <div>
         <strong>Status:</strong> {{ invite.status }}
       </div>
 
-      <div *ngIf="invite.status === InviteStatus.PENDING" class="d-flex gap-2">
-        <button mat-raised-button color="primary"
+      <div *ngIf="invite.status === 'PENDING'" class="mt-2">
+        <button class="btn btn-primary me-2"
                 (click)="acceptInvite(invite)">
           Accept
         </button>
-
-        <button mat-raised-button color="warn"
+        <button class="btn btn-danger"
                 (click)="rejectInvite(invite)">
           Reject
         </button>
       </div>
-
     </div>
-
   </div>
 </div>
