@@ -125,6 +125,9 @@ public class TripDTO {
     }
 
     public ArrayList<String> getParticipants() {
+        if (participants == null) {
+            participants = new ArrayList<>();
+        }
         return participants;
     }
 
@@ -133,18 +136,18 @@ public class TripDTO {
     }
 
     public boolean containsParticipant(String participant) {
-        return this.participants != null && this.participants.contains(participant);
+        return getParticipants().contains(participant);
     }
 
     public void addParticipant(String participant) {
-        if(participants == null) {
-            participants = new ArrayList<>();
-        }
-        participants.add(participant);
+        getParticipants().add(participant);
     }
 
     //Mara
     public List<String> getImageURLs(){
+        if(imageURLs==null){
+            imageURLs=new ArrayList<>();
+        }
         return imageURLs;
     }
 
