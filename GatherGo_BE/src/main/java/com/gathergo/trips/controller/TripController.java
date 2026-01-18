@@ -59,6 +59,33 @@ public class TripController {
         return response;
     }
 
+    @GetMapping("/byOwner/{ownerEmail}")
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(@PathVariable String ownerEmail) {
+        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+
+                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    if(ownerEmail.equals(trip.getOwnerEmail())) {
+                        trips.add(trip);
+                    }
+                }
+
+                response.setResult(ResponseEntity.ok(trips));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
     //we get the Trip by using the tripId
     //same ideas as above
     @GetMapping("/{tripid}")

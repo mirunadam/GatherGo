@@ -1,10 +1,10 @@
 import {InviteStatus} from "./invite-status";
 
 export class InviteDto {
-  uuid: string | undefined = undefined;
-  tripId: string | undefined = undefined;
-  senderEmail: string | undefined = undefined;
-  receiverEmail: string | undefined = undefined;
-  status: InviteStatus | undefined = undefined;
-  deleted: boolean | undefined = undefined;
+  uuid: string | undefined | null = undefined;
+  tripId: string | undefined | null = undefined;
+  senderEmail: string | undefined | null = undefined;
+  receiverEmail: string | undefined | null = undefined;
+  status: InviteStatus | undefined | null = undefined;
+  deleted: boolean | undefined | null = undefined;
 }

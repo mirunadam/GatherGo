@@ -7,7 +7,7 @@ import {InviteDto} from "../domain/invite.dto";
 })
 export class InviteService {
 
-  url = 'http://localhost:8080/api/invite'
+  url = 'http://localhost:8080/api/invites'
 
   constructor(private http: HttpClient) { }
 
