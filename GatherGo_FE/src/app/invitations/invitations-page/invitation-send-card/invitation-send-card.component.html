@@ -24,8 +24,8 @@
         </mat-form-field>
 
         <mat-autocomplete #tripAutocomplete="matAutocomplete" [displayWith]="displayTrip">
-          <mat-option *ngFor="let trip of tripOptions" [value]="trip.uuid">
-            {{ trip.itinerary }}
+          <mat-option *ngFor="let trip of tripOptions" [value]="trip">
+            {{ trip.name ? trip.name : 'UnnamedAdventure' }}
           </mat-option>
         </mat-autocomplete>
 
@@ -34,9 +34,9 @@
           <input type="text"
                  aria-label="Number"
                  matInput
-                 formControlName="tripUuid"
+                 formControlName="trip"
                  [matAutocomplete]="tripAutocomplete">
-          <mat-error *ngIf="inviteForm.get('tripUuid')?.invalid && inviteForm.get('tripUuid')?.touched" >
+          <mat-error *ngIf="inviteForm.get('trip')?.invalid && inviteForm.get('trip')?.touched" >
             Please select a trip
           </mat-error>
         </mat-form-field>
