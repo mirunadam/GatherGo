@@ -1,28 +1,21 @@
-import { Component, NgModule, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
-import { TripDto } from '../trips/domain/trip.dto';           
-import { AppModule } from '../app.module';
+import { TripDto } from '../trips/domain/trip.dto';
 import { NavigationModule } from '../navigation/navigation.module';
+import { interval, Subscription, map, of, switchMap, tap, throwError } from 'rxjs';
 
-export interface Activity {
-  id: string;
+type Tab = 'overview' | 'activities' | 'accommodations' | 'photos' | 'participants';
+
+/** Only used for the form (NOT stored as an array anymore) */
+interface ActivityForm {
   name: string;
   description: string;
   date: string;
   time: string;
-}
-
-export interface Accommodation {
-  id: string;
-  name: string;
-  address: string;
-  checkIn: string;
-  checkOut: string;
-  price: number;
 }
 
 @Component({
@@ -31,60 +24,71 @@ export interface Accommodation {
   imports: [CommonModule, FormsModule, RouterModule, NavigationModule],
   templateUrl: './trip-details.component.html',
 })
-export class TripDetailsComponent implements OnInit {
+export class TripDetailsComponent implements OnInit, OnDestroy {
   trip: TripDto | null = null;
-
-  // if you have user context later, wire it like colleagues do with LoggedInContextService
-  userId: string | null = null;
 
   isLoading = true;
   errorMsg: string | null = null;
 
-  activeTab: 'overview' | 'activities' | 'accommodations' | 'photos' | 'participants' = 'overview';
+  activeTab: Tab = 'overview';
+  tabs: Tab[] = ['overview', 'activities', 'accommodations', 'photos', 'participants'];
 
-  activities: Activity[] = [];
-  accommodations: Accommodation[] = [];
-  photos: any[] = [];
-  likedPhotos = new Set<string>();
-
+  // UI state
   showActivityForm = false;
   showAccommodationForm = false;
 
-  newActivity: Activity = { id: '', name: '', description: '', date: '', time: '' };
+  // form model (single item)
+  newActivity: ActivityForm = { name: '', description: '', date: '', time: '' };
+  newAccommodation: string = '';
 
-  newAccommodation: Accommodation = {
-    id: '',
-    name: '',
-    address: '',
-    checkIn: '',
-    checkOut: '',
-    price: 0,
-  };
+  photos: any[] = [];
+  likedPhotos = new Set<string>();
 
+  // auth
+  isLoggedIn = false;
+  userName: string | null = null;
+  userEmail: string | null = null;
+
+  private refreshSub?: Subscription;
   private geocoder = new google.maps.Geocoder();
-
   locationName = 'Loading location...';
 
-  mockParticipants = [ { id: '1', name: 'Demo User', email: 'demo@example.com' }, { id: '2', name: 'Sarah Johnson', email: 'sarah@example.com' }, { id: '3', name: 'Mike Chen', email: 'mike@example.com' }, ];
-
-  tabs: ('overview' | 'activities' | 'accommodations' | 'photos' | 'participants')[] = [
-    'overview',
-    'activities',
-    'accommodations',
-    'photos',
-    'participants',
+  mockParticipants = [
+    { id: '1', name: 'Demo User', email: 'demo@example.com' },
+    { id: '2', name: 'Sarah Johnson', email: 'sarah@example.com' },
+    { id: '3', name: 'Mike Chen', email: 'mike@example.com' },
   ];
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
-    private tripService: TripService
+    private tripService: TripService,
+    private profileService: ProfileService,
   ) {}
 
   ngOnInit() {
-    this.userId = localStorage.getItem('email'); // or your real user id if you have one
+    this.checkLoginStatus();
     this.loadTrip();
+
+    if (this.isLoggedIn) {
+      const uid = localStorage.getItem('uid');
+      if (uid) {
+        this.profileService.getUser(uid).subscribe({
+          next: (data: any) => {
+            this.userName = data.username || data.fullname;
+            localStorage.setItem('username', this.userName || '');
+            this.userEmail = data.email || null;
+          }
+        });
+      }
+    }
+
+    this.refreshSub = interval(5000).subscribe(() => this.refreshTrip());
+  }
+
+  ngOnDestroy() {
+    this.refreshSub?.unsubscribe();
   }
 
   private loadTrip() {
@@ -99,34 +103,18 @@ export class TripDetailsComponent implements OnInit {
     }
 
     this.tripService.getTripByUuid(uuid).subscribe({
-      next: (res:any) => {
+      next: (res: any) => {
         this.trip = res;
 
-        // These fields exist in TripForm -> TripDto:
-        // itinerary, accommodation, imageURL, imageURLs, dateStart/dateEnd, etc.
-        // Your Activity/Accommodation/Photos are currently not part of TripDto based on the shown code,
-        // so default to empty arrays.
-        this.activities = (res as any)?.activities ?? [];
-        this.accommodations = (res as any)?.accommodations ?? [];
+        // ✅ stop using old activities/accommodations arrays coming from FE mock
         this.photos = (res as any)?.photos ?? [];
         this.locationName = this.getLocationLabel(res);
-        // likes logic only if you really have likes + a user id
-        this.likedPhotos.clear();
-        if (this.userId) {
-          this.photos.forEach((p: any) => {
-            if (p?.likes?.includes(this.userId)) {
-              this.likedPhotos.add(p.id);
-            }
-          });
-        }
 
         this.isLoading = false;
       },
-      error: (err:any) => {
+      error: (err: any) => {
         console.error('Failed to load trip', err);
         this.trip = null;
-        this.activities = [];
-        this.accommodations = [];
         this.photos = [];
         this.likedPhotos.clear();
 
@@ -136,78 +124,155 @@ export class TripDetailsComponent implements OnInit {
     });
   }
 
+  private refreshTrip() {
+    const uuid = this.route.snapshot.paramMap.get('uuid');
+    if (!uuid) return;
+
+    this.tripService.getTripByUuid(uuid).subscribe({
+      next: (res: any) => (this.trip = res),
+      error: (err) => console.error('Failed to refresh trip', err),
+    });
+  }
+
   goBack() {
     this.location.back();
   }
 
+  checkLoginStatus(): void {
+    this.userEmail = localStorage.getItem('email');
+    this.userName = localStorage.getItem('username');
+    this.isLoggedIn = !!localStorage.getItem('idToken');
+  }
+
+  private getUserEmail$() {
+    if (this.userEmail) return of(this.userEmail);
+
+    const uid = localStorage.getItem('uid');
+    if (!uid) return throwError(() => new Error('No uid in localStorage'));
+
+    return this.profileService.getUser(uid).pipe(
+      map((data: any) => data.email as string),
+      tap(email => {
+        this.userEmail = email;
+        localStorage.setItem('email', email);
+      })
+    );
+  }
+
+  joinTrip(tripUuid: string) {
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    this.getUserEmail$()
+      .pipe(switchMap(email => this.tripService.addParticipantToTrip(tripUuid, email)))
+      .subscribe({
+        next: (updatedTrip) => {
+          // ✅ best: use backend response as source of truth
+          this.trip = updatedTrip;
+        },
+        error: (err) => {
+          console.error('Failed to join trip', err);
+          this.errorMsg = 'Failed to join trip.';
+        }
+      });
+  }
+
+  /** Save one activity line into trip.itinerary (backend) */
   addActivity() {
-    this.activities.push({ ...this.newActivity, id: Date.now().toString() });
-    this.newActivity = { id: '', name: '', description: '', date: '', time: '' };
-    this.showActivityForm = false;
+    if (!this.trip) return;
+
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    const name = this.newActivity.name.trim();
+    if (!name) return;
+
+    const line =
+      `${this.newActivity.date || ''} ${this.newActivity.time || ''} - ${name}` +
+      (this.newActivity.description.trim() ? `: ${this.newActivity.description.trim()}` : '');
+
+    this.getUserEmail$()
+      .pipe(switchMap(email => this.tripService.addItineraryItem(this.trip!.uuid, email, line.trim())))
+      .subscribe({
+        next: (updatedTrip) => {
+          this.trip = updatedTrip;
+          this.newActivity = { name: '', description: '', date: '', time: '' };
+          this.showActivityForm = false;
+        },
+        error: (err) => {
+          console.error('Failed to save activity', err);
+          this.errorMsg = 'Failed to save activity.';
+        }
+      });
   }
 
   addAccommodation() {
-    this.accommodations.push({ ...this.newAccommodation, id: Date.now().toString() });
-    this.newAccommodation = { id: '', name: '', address: '', checkIn: '', checkOut: '', price: 0 };
-    this.showAccommodationForm = false;
+    if (!this.trip) return;
+
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    const item = this.newAccommodation.trim();
+    if (!item) return;
+
+    this.getUserEmail$()
+      .pipe(switchMap(email => this.tripService.addAccommodation(this.trip!.uuid, email, item)))
+      .subscribe({
+        next: (updatedTrip) => {
+          this.trip = updatedTrip;
+          this.newAccommodation = '';
+          this.showAccommodationForm = false;
+        },
+        error: (err) => {
+          console.error('Failed to add accommodation suggestion', err);
+          this.errorMsg = 'Failed to add accommodation suggestion';
+        }
+      });
   }
 
   toggleLike(photoId: string) {
     this.likedPhotos.has(photoId) ? this.likedPhotos.delete(photoId) : this.likedPhotos.add(photoId);
   }
 
-  joinTrip(tripUuid: string) {
-    const email = localStorage.getItem('email');
-    if(email) {
-      this.tripService.addParticipantToTrip(tripUuid, email).subscribe((res) => {
-        console.log(res);
-      });
-    }
-  }
-
   private getLocationLabel(trip: TripDto): string {
-  const lat = trip.location?.latitude;
-  const lng = trip.location?.longitude;
+    const lat = trip.location?.latitude;
+    const lng = trip.location?.longitude;
+    if (lat == null || lng == null) return 'Online / TBD';
 
-  if (lat == null || lng == null) return 'Online / TBD';
+    this.locationName = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
-  // Start with coords while we reverse-geocode async
-  this.locationName = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    this.geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === 'OK' && results && results[0]) {
+        this.locationName = this.extractCityAndCountry(results[0]);
+      } else {
+        this.locationName = 'Unknown location';
+      }
+    });
 
-  const latLng = { lat, lng };
-  this.geocoder.geocode({ location: latLng }, (results, status) => {
-    if (status === 'OK' && results && results[0]) {
-      this.locationName = this.extractCityAndCountry(results[0]);
-    } else {
-      this.locationName = 'Unknown location';
-    }
-  });
-
-  return this.locationName;
-}
-
-private extractCityAndCountry(result: google.maps.GeocoderResult): string {
-  let city = '';
-  let country = '';
-
-  for (const component of result.address_components) {
-    const types = component.types;
-
-    if (
-      !city &&
-      (types.includes('locality') ||
-        types.includes('postal_town') ||
-        types.includes('administrative_area_level_2'))
-    ) {
-      city = component.long_name;
-    }
-
-    if (!country && types.includes('country')) {
-      country = component.long_name;
-    }
+    return this.locationName;
   }
 
-  return city ? `${city}, ${country}` : country || 'Unknown location';
-}
+  private extractCityAndCountry(result: google.maps.GeocoderResult): string {
+    let city = '';
+    let country = '';
 
+    for (const component of result.address_components) {
+      const types = component.types;
+
+      if (!city && (types.includes('locality') || types.includes('postal_town') || types.includes('administrative_area_level_2'))) {
+        city = component.long_name;
+      }
+      if (!country && types.includes('country')) {
+        country = component.long_name;
+      }
+    }
+
+    return city ? `${city}, ${country}` : country || 'Unknown location';
+  }
 }

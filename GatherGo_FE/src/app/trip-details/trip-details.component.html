@@ -92,12 +92,29 @@
           </span>
         </div>
 
-        <button
-              (click)="joinTrip(trip.uuid)"
+        <!-- <button
+              (click)="joinTrip(t.uuid)"
               class="px-4 py-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all"
             >
               Join Trip
-            </button>
+            </button> -->
+          <button
+            (click)="joinTrip(t.uuid)"
+            class="px-4 py-2 rounded-lg transition-all"
+            [disabled]="isLoggedIn && userEmail && (t.participants?.includes(userEmail) ?? false)"
+            [ngClass]="(isLoggedIn && userEmail && (t.participants?.includes(userEmail) ?? false))
+              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              : 'bg-gradient-to-r from-teal-500 to-blue-500 text-white hover:from-teal-600 hover:to-blue-600'"
+          >
+            <ng-container *ngIf="!isLoggedIn; else loggedInText">
+              Login to Join
+            </ng-container>
+
+            <ng-template #loggedInText>
+              {{ (userEmail && (t.participants?.includes(userEmail) ?? false)) ? 'Already Joined' : 'Join Trip' }}
+            </ng-template>
+          </button>
+
         </div>
       </div>
     </div>
@@ -144,7 +161,38 @@
         </div>
 
         <!-- ACTIVITIES (local UI mock for now) -->
-        <div *ngIf="activeTab === 'activities'">
+         <div *ngIf="activeTab === 'activities'">
+          <button
+            (click)="showActivityForm = !showActivityForm"
+            class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
+          >
+            {{ showActivityForm ? 'Close' : 'Add Activity' }}
+          </button>
+
+          <form *ngIf="showActivityForm" (ngSubmit)="addActivity()" class="space-y-3">
+            <!-- same inputs -->
+            <input [(ngModel)]="newActivity.name" name="name" required class="w-full border rounded px-3 py-2" />
+            <textarea [(ngModel)]="newActivity.description" name="desc" class="w-full border rounded px-3 py-2"></textarea>
+            <div class="flex gap-3">
+              <input type="date" [(ngModel)]="newActivity.date" name="date" class="border rounded px-3 py-2" />
+              <input type="time" [(ngModel)]="newActivity.time" name="time" class="border rounded px-3 py-2" />
+            </div>
+            <button class="bg-teal-500 text-white px-4 py-2 rounded">Save</button>
+          </form>
+
+          <div class="mt-6 bg-gray-50 p-4 rounded">
+            <ng-container *ngIf="t.itinerary?.length; else noActs">
+              <ul class="list-disc pl-5 space-y-2">
+                <li *ngFor="let item of t.itinerary">{{ item }}</li>
+              </ul>
+            </ng-container>
+
+            <ng-template #noActs>
+              <p class="text-gray-600">No activities yet.</p>
+            </ng-template>
+          </div>
+        </div>
+        <!-- <div *ngIf="activeTab === 'activities'">
           <button
             (click)="showActivityForm = !showActivityForm"
             class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
@@ -188,57 +236,88 @@
               {{ a.date }} {{ a.time }}
             </p>
           </div>
-        </div>
+        </div> -->
 
         <!-- ACCOMMODATIONS (local UI mock for now) -->
-        <div *ngIf="activeTab === 'accommodations'">
-          <button
-            (click)="showAccommodationForm = !showAccommodationForm"
-            class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
-          >
-            {{ showAccommodationForm ? 'Close' : 'Add Accommodation' }}
-          </button>
+        <!-- ACCOMMODATIONS -->
+<div *ngIf="activeTab === 'accommodations'">
 
-          <form *ngIf="showAccommodationForm" (ngSubmit)="addAccommodation()" class="space-y-3">
-            <input
-              [(ngModel)]="newAccommodation.name"
-              name="accName"
-              placeholder="Name"
-              class="w-full border rounded px-3 py-2"
-              required
-            />
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-xl font-semibold text-gray-800">Accommodation suggestions</h3>
 
-            <input
-              [(ngModel)]="newAccommodation.address"
-              name="address"
-              placeholder="Address"
-              class="w-full border rounded px-3 py-2"
-            />
+    <button
+      (click)="showAccommodationForm = !showAccommodationForm"
+      class="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition"
+    >
+      {{ showAccommodationForm ? 'Close' : 'Suggest accommodation' }}
+    </button>
+  </div>
 
-            <div class="flex flex-col md:flex-row gap-3">
-              <input type="date" [(ngModel)]="newAccommodation.checkIn" name="checkIn" class="border rounded px-3 py-2" />
-              <input type="date" [(ngModel)]="newAccommodation.checkOut" name="checkOut" class="border rounded px-3 py-2" />
-              <input type="number" [(ngModel)]="newAccommodation.price" name="price" class="border rounded px-3 py-2" placeholder="Price" />
+  <!-- Suggest form -->
+  <form
+    *ngIf="showAccommodationForm"
+    (ngSubmit)="addAccommodation()"
+    class="space-y-3 bg-gray-50 p-4 rounded-lg border"
+  >
+    <label class="block text-sm text-gray-600">
+      Suggestion (hotel name, Airbnb link, address, notes)
+    </label>
+
+    <textarea
+      [(ngModel)]="newAccommodation"
+      name="newAccommodationSuggestion"
+      placeholder="e.g. Hotel Transylvania, Strada Exemplu 12, or https://airbnb.com/..."
+      class="w-full border rounded px-3 py-2"
+      rows="3"
+      required
+    ></textarea>
+
+    <div class="flex gap-3">
+      <button
+        type="submit"
+        class="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition"
+      >
+        Save
+      </button>
+
+      <button
+        type="button"
+        (click)="showAccommodationForm = false"
+        class="bg-white border px-4 py-2 rounded hover:bg-gray-100 transition"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+
+  <!-- List -->
+  <div class="mt-6">
+    <ng-container *ngIf="t.accommodation?.length; else noAccommodation">
+      <div class="space-y-3">
+        <div
+          *ngFor="let acc of t.accommodation; let i = index"
+          class="bg-white border rounded-lg p-4 shadow-sm"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <p class="text-gray-800 whitespace-pre-wrap">{{ acc }}</p>
             </div>
 
-            <button class="bg-teal-500 text-white px-4 py-2 rounded">Save</button>
-          </form>
-
-          <div *ngIf="!accommodations.length" class="text-gray-600 mt-4">
-            No accommodations yet.
-          </div>
-
-          <div *ngFor="let a of accommodations" class="bg-gray-50 p-4 rounded mt-3">
-            <h4 class="text-lg">{{ a.name }}</h4>
-            <p class="text-gray-600">{{ a.address }}</p>
-            <p class="text-sm text-gray-500">
-              Check-in: {{ a.checkIn || '-' }} • Check-out: {{ a.checkOut || '-' }}
-            </p>
-            <p class="text-sm text-gray-700" *ngIf="a.price">
-              Price: {{ a.price }}
-            </p>
+            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              #{{ i + 1 }}
+            </span>
           </div>
         </div>
+      </div>
+    </ng-container>
+
+    <ng-template #noAccommodation>
+      <p class="text-gray-600">No accommodation suggestions yet.</p>
+    </ng-template>
+  </div>
+
+</div>
+
 
         <!-- PHOTOS -->
         <div *ngIf="activeTab === 'photos'">

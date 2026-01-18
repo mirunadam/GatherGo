@@ -30,6 +30,22 @@ export class TripService {
       });
   }
 
+    addItineraryItem(uuid: string, email: string, item: string) {
+    return this.http.post<TripDto>(
+      `${this.url}/addItineraryItem`,
+      null,
+      { params: { uuid, email, item } }
+    );
+  }
+
+  addAccommodation(uuid: string, email: string, item: string) {
+    return this.http.post<TripDto>(
+      `${this.url}/addAccommodation`,
+      null,
+      { params: { uuid, email, item } }
+    );
+  }
+
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }

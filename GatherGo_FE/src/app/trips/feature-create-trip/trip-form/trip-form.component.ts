@@ -68,7 +68,7 @@ export class TripFormComponent implements OnInit {
     budget: [null as number | null, [Validators.required, Validators.min(0)]],
     currency: [null as CurrencyCode | null, [Validators.required]],
     maxPeople: [null as number | null, [Validators.min(0)]],
-    itinerary: [null as string | null, []],
+    itinerary: this.fb.control<string | null>(null),
     accommodation: [null as string | null, []],
     isPublic: [false],
     participants: [[] as string[]]
@@ -95,7 +95,7 @@ export class TripFormComponent implements OnInit {
           budget: res.budget,
           currency: res.currency,
           maxPeople: res.maxPeople,
-          itinerary: res.itinerary,
+          itinerary: (res.itinerary ?? []).join('\n'),
           accommodation: res.accommodation,
           isPublic: res.isPublic,
           participants: res.participants
@@ -219,7 +219,7 @@ export class TripFormComponent implements OnInit {
       budget: this.tripForm.value.budget,
       currency: this.tripForm.value.currency,
       maxPeople: this.tripForm.value.maxPeople,
-      itinerary: this.tripForm.value.itinerary,
+      itinerary:  (this.tripForm.value.itinerary ?? '').split('\n').map(s => s.trim()).filter(Boolean),
       accommodation: this.tripForm.value.accommodation,
       imageURL: mainImageUrl,
       imageURLs: extraImages,

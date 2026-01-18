@@ -42,7 +42,7 @@ const STATIC_TRIPS: FrontendTrip[] = [
   //   NgIf,
   //   FormsModule,
   // ],
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   
@@ -100,7 +100,7 @@ export class HomeComponent implements OnInit {
     // Create the base object
     const frontendTrip: FrontendTrip = {
       id: dto.uuid,
-      name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
+      name: 'Unnamed Adventure', // Use itinerary as name fallback
       location: 'Loading location...', // Placeholder while geocoding runs
       agency: 'Community Trip', 
       price: dto.budget || 0,

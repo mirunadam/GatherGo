@@ -10,7 +10,7 @@ export interface TripDto {
   budget: number | null | undefined,
   currency: CurrencyCode | null | undefined;
   maxPeople: number | null | undefined;
-  itinerary: string | null | undefined;
+  itinerary: string[] | null | undefined;
   accommodation: string | null | undefined;
   imageURL: string | null | undefined;
   imageURLs?: string[];
