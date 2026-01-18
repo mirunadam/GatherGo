@@ -11,7 +11,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:4200")
 //class handles http requests and returns JSON responses
 @RestController
 //all endpoints in this class will start with /api/trips
@@ -90,6 +90,10 @@ public class TripController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 TripDTO trip = dataSnapshot.getValue(TripDTO.class);
+                if (trip == null) {
+                    response.setResult(ResponseEntity.notFound().build());
+                    return;
+                }
                 if(!trip.containsParticipant(email)) {
                     trip.addParticipant(email);
                     response.setResult(ResponseEntity.ok(createOrUpdateTrip(trip).getBody()));
@@ -101,6 +105,88 @@ public class TripController {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
+    @PostMapping("/addItineraryItem")
+    public DeferredResult<ResponseEntity<TripDTO>> addItineraryItem(
+            @RequestParam String uuid,
+            @RequestParam String email,
+            @RequestParam String item
+    ) {
+        final DeferredResult<ResponseEntity<TripDTO>> response = new DeferredResult<>();
+
+        dbRef.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                TripDTO trip = snapshot.getValue(TripDTO.class);
+
+                if (trip == null) {
+                    response.setResult(ResponseEntity.notFound().build());
+                    return;
+                }
+
+                if (!trip.canEditTrip(email)) {
+                    response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+                    return;
+                }
+
+                if (item == null || item.trim().isEmpty()) {
+                    response.setResult(ResponseEntity.badRequest().build());
+                    return;
+                }
+
+                trip.addItinerary(item.trim());
+                response.setResult(createOrUpdateTrip(trip));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
+    @PostMapping("/addAccommodation")
+    public DeferredResult<ResponseEntity<TripDTO>> addAccommodationSuggestion(
+            @RequestParam String uuid,
+            @RequestParam String email,
+            @RequestParam String item
+    ) {
+        final DeferredResult<ResponseEntity<TripDTO>> response = new DeferredResult<>();
+
+        dbRef.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                TripDTO trip = snapshot.getValue(TripDTO.class);
+
+                if (trip == null) {
+                    response.setResult(ResponseEntity.notFound().build());
+                    return;
+                }
+
+                if (!trip.canEditTrip(email)) {
+                    response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+                    return;
+                }
+
+                if (item == null || item.trim().isEmpty()) {
+                    response.setResult(ResponseEntity.badRequest().build());
+                    return;
+                }
+
+                trip.addAccommodation(item.trim());
+                response.setResult(createOrUpdateTrip(trip));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
                 response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
             }
         });

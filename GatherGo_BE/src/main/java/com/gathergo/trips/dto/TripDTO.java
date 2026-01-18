@@ -10,19 +10,20 @@ import java.util.List;
 public class TripDTO {
     private String uuid;
     private String ownerEmail;
+    private String name;
     private PointDTO location;
     private Date dateStart;
     private Date dateEnd;
     private int budget;
     private CurrencyCode currency;
     private int maxPeople;
-    private String itinerary;
-    private String accommodation;
+    private List<String> itinerary;
+    private List<String> accommodation;
     private String imageURL;//main trip Image
     private boolean isPublic;
     //Mara
     private List<String> imageURLs;
-    private ArrayList<String> participants;
+    private List<String> participants;
 
     public TripDTO() {
 
@@ -84,20 +85,36 @@ public class TripDTO {
         this.maxPeople = maxPeople;
     }
 
-    public String getItinerary() {
+    public List<String> getItinerary() {
         return itinerary;
     }
 
-    public void setItinerary(String itinerary) {
+    public void setItinerary(List<String> itinerary) {
         this.itinerary = itinerary;
     }
 
-    public String getAccommodation() {
+    public void addItinerary(String item) {
+        if (itinerary == null) itinerary = new ArrayList<>();
+        itinerary.add(item);
+    }
+
+    public List<String> getAccommodation() {
         return accommodation;
     }
 
-    public void setAccommodation(String accommodation) {
+    public void setAccommodation(List<String> accommodation) {
         this.accommodation = accommodation;
+    }
+
+    public void addAccommodation(String item) {
+        if (accommodation == null) accommodation = new ArrayList<>();
+        accommodation.add(item);
+    }
+
+    public boolean canEditTrip(String email) {
+        if (email == null) return false;
+        if (ownerEmail != null && ownerEmail.equalsIgnoreCase(email)) return true;
+        return participants != null && participants.stream().anyMatch(p -> p.equalsIgnoreCase(email));
     }
 
     public String getImageURL() {
@@ -124,27 +141,38 @@ public class TripDTO {
         isPublic = aPublic;
     }
 
-    public ArrayList<String> getParticipants() {
+    public List<String> getParticipants() {
+        if (participants == null) {
+            participants = new ArrayList<>();
+        }
         return participants;
     }
 
-    public void setParticipants(ArrayList<String> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
 
     public boolean containsParticipant(String participant) {
-        return this.participants != null && this.participants.contains(participant);
+        return getParticipants().contains(participant);
     }
 
     public void addParticipant(String participant) {
-        if(participants == null) {
-            participants = new ArrayList<>();
-        }
-        participants.add(participant);
+        getParticipants().add(participant);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     //Mara
     public List<String> getImageURLs(){
+        if(imageURLs==null){
+            imageURLs=new ArrayList<>();
+        }
         return imageURLs;
     }
 
