@@ -11,12 +11,12 @@ import { interval, Subscription, map, of, switchMap, tap, throwError } from 'rxj
 type Tab = 'overview' | 'activities' | 'accommodations' | 'photos' | 'participants';
 
 /** Only used for the form (NOT stored as an array anymore) */
-interface ActivityForm {
-  name: string;
-  description: string;
-  date: string;
-  time: string;
-}
+// interface ActivityForm {
+//   name: string;
+//   description: string;
+//   date: string;
+//   time: string;
+// }
 
 @Component({
   selector: 'app-trip-details',
@@ -38,7 +38,7 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
   showAccommodationForm = false;
 
   // form model (single item)
-  newActivity: ActivityForm = { name: '', description: '', date: '', time: '' };
+  newActivity: string = '';  //ActivityForm = { name: '', description: '', date: '', time: '' };
   newAccommodation: string = '';
 
   photos: any[] = [];
@@ -84,7 +84,7 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.refreshSub = interval(5000).subscribe(() => this.refreshTrip());
+    this.refreshSub = interval(15000).subscribe(() => this.refreshTrip());
   }
 
   ngOnDestroy() {
@@ -129,7 +129,10 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
     if (!uuid) return;
 
     this.tripService.getTripByUuid(uuid).subscribe({
-      next: (res: any) => (this.trip = res),
+      next: (res: any) => {
+        this.trip = res;
+        this.locationName = this.getLocationLabel(res);
+      },
       error: (err) => console.error('Failed to refresh trip', err),
     });
   }
@@ -179,7 +182,6 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Save one activity line into trip.itinerary (backend) */
   addActivity() {
     if (!this.trip) return;
 
@@ -187,20 +189,16 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
-
-    const name = this.newActivity.name.trim();
-    if (!name) return;
-
-    const line =
-      `${this.newActivity.date || ''} ${this.newActivity.time || ''} - ${name}` +
-      (this.newActivity.description.trim() ? `: ${this.newActivity.description.trim()}` : '');
+    
+    const line = this.newActivity.trim();
+    if (!line) return;
 
     this.getUserEmail$()
-      .pipe(switchMap(email => this.tripService.addItineraryItem(this.trip!.uuid, email, line.trim())))
+      .pipe(switchMap(email => this.tripService.addItineraryItem(this.trip!.uuid, email, line)))
       .subscribe({
         next: (updatedTrip) => {
           this.trip = updatedTrip;
-          this.newActivity = { name: '', description: '', date: '', time: '' };
+          this.newActivity = '';
           this.showActivityForm = false;
         },
         error: (err) => {

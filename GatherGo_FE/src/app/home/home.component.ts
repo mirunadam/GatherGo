@@ -98,15 +98,40 @@ export class HomeComponent implements OnInit {
   private mapTripDtoToFrontendModel(dto: TripDto): FrontendTrip {
 
     // Create the base object
-    const frontendTrip: FrontendTrip = {
-      id: dto.uuid,
-      name: 'Unnamed Adventure', // Use itinerary as name fallback
-      location: 'Loading location...', // Placeholder while geocoding runs
-      agency: 'Community Trip', 
-      price: dto.budget || 0,
-      period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
-      imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
-    };
+    // const frontendTrip: FrontendTrip = {
+    //   id: dto.uuid,
+    //   name: 'Unnamed Adventure', // Use itinerary as name fallback
+    //   location: 'Loading location...', // Placeholder while geocoding runs
+    //   agency: 'Community Trip', 
+    //   price: dto.budget || 0,
+    //   period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
+    //   imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
+    // };
+    const itineraryArray: string[] = Array.isArray(dto.itinerary)
+    ? dto.itinerary : [];
+    // : (typeof dto.itinerary === 'string' && dto.itinerary.trim()
+    //     ? dto.itinerary.split('\n').map(s => s.trim()).filter(Boolean)
+    //     : []);
+
+
+  const tripName =
+    // (dto.name && dto.name.trim()) ||
+    (itineraryArray.length ? itineraryArray[0] : '') ||
+    'Unnamed Adventure';
+
+  // Create the base object (sync fields)
+  const frontendTrip: FrontendTrip = {
+    id: dto.uuid,
+    name: tripName,
+    location: 'Loading location...',
+    agency: dto.ownerEmail ? `Created by ${dto.ownerEmail}` : 'Community Trip',
+    price: dto.budget ?? 0,
+    period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
+    imageUrl:
+      dto.imageURL ||
+      (Array.isArray(dto.imageURLs) && dto.imageURLs.length ? dto.imageURLs[0] : '') ||
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80',
+  };
 
     if (dto.location && dto.location.latitude && dto.location.longitude) {
       const latLng = { lat: dto.location.latitude, lng: dto.location.longitude };
