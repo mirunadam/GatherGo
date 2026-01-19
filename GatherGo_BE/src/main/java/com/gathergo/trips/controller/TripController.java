@@ -169,10 +169,10 @@ public class TripController {
                 }
 
                 if (!trip.canEditTrip(email)) {
+                    System.out.println("EDIT CHECK FAIL: uuid=" + uuid + " email=" + email+ " owner=" + trip.getOwnerEmail()+ " participants=" + trip.getParticipants());
                     response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
                     return;
                 }
-                System.out.println("EDIT CHECK FAIL: uuid=" + uuid + " email=" + email+ " owner=" + trip.getOwnerEmail()+ " participants=" + trip.getParticipants());
 
                 if (item == null || item.trim().isEmpty()) {
                     response.setResult(ResponseEntity.badRequest().build());
@@ -210,18 +210,23 @@ public class TripController {
                     return;
                 }
 
-                if (!trip.canEditTrip(email)) {
-                    response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
-                    return;
-                }
+//                if (!trip.canEditTrip(email)) {
+//                    response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+//                    return;
+//                }
 
                 if (item == null || item.trim().isEmpty()) {
                     response.setResult(ResponseEntity.badRequest().build());
                     return;
                 }
 
-                trip.addAccommodation(item.trim());
-                response.setResult(createOrUpdateTrip(trip));
+                try {
+                    trip.addItinerary(item.trim());
+                    response.setResult(createOrUpdateTrip(trip));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                }
             }
 
             @Override

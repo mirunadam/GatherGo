@@ -96,10 +96,13 @@ public class TripDTO {
 
     public void addItinerary(String item) {
         if (item == null || item.isBlank()) return;
-        if (itinerary == null || itinerary.isBlank()) {
+
+        String current = (itinerary == null) ? "" : itinerary;
+
+        if (current.isBlank()) {
             itinerary = item.trim();
         } else {
-            itinerary = itinerary + "\n" + item.trim();
+            itinerary = current + "\n" + item.trim();
         }
     }
 
@@ -166,26 +169,26 @@ public class TripDTO {
         this.participants = participants;
     }
 
-//    public boolean containsParticipant(String participant) {
-//        return getParticipants().contains(participant);
-//    }
-//
-//    public void addParticipant(String participant) {
-//        getParticipants().add(participant);
-//    }
-
-    //CASE SENSITIVE
     public boolean containsParticipant(String participant) {
-        if (participant == null) return false;
-        String p = participant.trim();
-        return getParticipants().stream()
-                .anyMatch(x -> x != null && x.trim().equalsIgnoreCase(p));
+        return getParticipants().contains(participant);
     }
 
     public void addParticipant(String participant) {
-        if (participant == null || participant.isBlank()) return;
-        if (!containsParticipant(participant)) getParticipants().add(participant.trim());
+        getParticipants().add(participant);
     }
+
+    //CASE SENSITIVE
+//    public boolean containsParticipant(String participant) {
+//        if (participant == null) return false;
+//        String p = participant.trim();
+//        return getParticipants().stream()
+//                .anyMatch(x -> x != null && x.trim().equalsIgnoreCase(p));
+//    }
+//
+//    public void addParticipant(String participant) {
+//        if (participant == null || participant.isBlank()) return;
+//        if (!containsParticipant(participant)) getParticipants().add(participant.trim());
+//    }
 
     public String getName() {
         return name;
