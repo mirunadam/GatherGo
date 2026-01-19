@@ -105,7 +105,6 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.trip = res;
 
-        // ✅ stop using old activities/accommodations arrays coming from FE mock
         this.photos = (res as any)?.photos ?? [];
         this.locationName = this.getLocationLabel(res);
 
