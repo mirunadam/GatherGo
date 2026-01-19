@@ -60,6 +60,7 @@ export class InvitationSendCardComponent implements OnInit{
       const invite: InviteDto = {
         uuid: undefined,
         tripId: this.inviteForm.value.trip?.uuid,
+        tripName: this.inviteForm.value.trip?.name,
         senderEmail: this.senderEmail,
         receiverEmail: this.inviteForm.value.email,
         status: InviteStatus.PENDING,
