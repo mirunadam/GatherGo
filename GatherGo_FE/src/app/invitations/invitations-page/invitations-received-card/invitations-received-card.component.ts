@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForOf, NgIf } from "@angular/common";
-import { InviteService } from "../../services/invite.service";
-import { LoggedInContextService } from "../../../services/logged-in-context.service";
-import { InviteDto } from "../../domain/invite.dto";
-import { InviteStatus } from "../../domain/invite-status";
-import { MatButtonModule } from "@angular/material/button";
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { NgForOf, NgIf } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+
+import { InviteDto } from '../../domain/invite.dto';
+import { InviteStatus } from '../../domain/invite-status';
+import { InviteService } from '../../services/invite.service';
+import { TripService } from '../../../trips/services/trip.service';
 
 @Component({
   selector: 'app-invitations-received-card',
@@ -17,38 +18,42 @@ import { MatButtonModule } from "@angular/material/button";
   templateUrl: './invitations-received-card.component.html',
   styleUrls: ['./invitations-received-card.component.scss']
 })
-export class InvitationsReceivedCardComponent implements OnInit {
+export class InvitationsReceivedCardComponent {
 
-  invites: InviteDto[] = [];
-  userEmail: string | undefined;
+  // ✅ data comes from parent
+  @Input() invites: InviteDto[] = [];
+
+  // ✅ notify parent when handled
+  @Output() inviteHandled = new EventEmitter<void>();
 
   constructor(
     private inviteService: InviteService,
-    private loggedInContext: LoggedInContextService
+    private tripService: TripService
   ) {}
 
-  ngOnInit() {
-    this.loggedInContext.getUserData().subscribe(user => {
-      this.userEmail = user.email;
-
-      if (this.userEmail) {
-        this.inviteService
-          .getAllInvitesByReceiverEmail(this.userEmail)
-          .subscribe(invites => {
-            this.invites = invites;
-          });
-      }
-    });
-  }
-
   acceptInvite(invite: InviteDto) {
-    invite.status = InviteStatus.ACCEPTED;
-    this.inviteService.createInvite(invite).subscribe();
+    if (!invite.tripId || !invite.receiverEmail) {
+      return;
+    }
+
+    // 1️⃣ add participant to trip
+    this.tripService
+      .addParticipant(invite.tripId, invite.receiverEmail)
+      .subscribe(() => {
+
+        // 2️⃣ mark invite as accepted & deleted
+        this.inviteService.acceptInvite(invite.uuid!)
+          .subscribe(() => {
+            this.inviteHandled.emit();
+          });
+      });
   }
 
   rejectInvite(invite: InviteDto) {
-    invite.status = InviteStatus.REJECTED;
-    this.inviteService.createInvite(invite).subscribe();
+    this.inviteService.rejectInvite(invite.uuid!)
+      .subscribe(() => {
+        this.inviteHandled.emit();
+      });
   }
 
   protected readonly InviteStatus = InviteStatus;

@@ -23,7 +23,7 @@ public class TripDTO {
     private boolean isPublic;
     //Mara
     private List<String> imageURLs;
-    private ArrayList<String> participants;
+    private List<String> participants;
 
     public TripDTO() {
 
@@ -125,14 +125,14 @@ public class TripDTO {
         isPublic = aPublic;
     }
 
-    public ArrayList<String> getParticipants() {
+    public List<String> getParticipants() {
         if (participants == null) {
             participants = new ArrayList<>();
         }
         return participants;
     }
 
-    public void setParticipants(ArrayList<String> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
 

@@ -11,7 +11,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;
 import java.util.List;
-
+//@CrossOrigin(origins = "http://localhost:4200")
 //class handles http requests and returns JSON responses
 @RestController
 //all endpoints in this class will start with /api/trips
@@ -25,52 +25,31 @@ public class TripController {
     //this @GetMapping() will send a request of type GET/api/trips
     //because Firebase works asynchronously (it doesn’t return immediately
     public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTrips() {
-        //we get the list of trips wrapped in an HTTP response
         final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
-        //a container which will hold the responses
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-        //firebase call to get all trips under the trips node
-        //addListenerForSingleValueEvent->fetch data once not continuously
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-            //this function will run when the Firebase will successfully fetch data
-            //snapshot will contain all the trips from the FireBase
-                List<TripDTO> trips = new ArrayList<>();
-                //this was created to store trip objects
 
-                //we will loop over all the child nodes in Firebase(the trips in my case)
-                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
-                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
-                    //the json is converted into the TripDTO and then put in the trips list
-                    trips.add(trip);
-                }
-
-                response.setResult(ResponseEntity.ok(trips));
-                //when everything is ok we can send the list of trips as Json with http200 which means everything was ok
-            }
-
-            //if something failed we return a http500 to the frontend
-            @Override
-            public void onCancelled(DatabaseError error) {
-                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-            }
-        });
-
-        return response;
-    }
-
-    @GetMapping("/byOwner/{ownerEmail}")
-    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(@PathVariable String ownerEmail) {
-        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 List<TripDTO> trips = new ArrayList<>();
 
-                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
-                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
-                    if(ownerEmail.equals(trip.getOwnerEmail())) {
+                for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
+                    try {
+                        TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+
+                        if (trip == null) {
+                            System.err.println("Trip is null (failed mapping) for key=" + tripSnapshot.getKey());
+                            continue;
+                        }
+
+                        if (trip.getUuid() == null) {
+                            trip.setUuid(tripSnapshot.getKey());
+                        }
+
                         trips.add(trip);
+                    } catch (Exception e) {
+                        System.err.println("Failed to map trip key=" + tripSnapshot.getKey() + " error=" + e.getMessage());
+                        e.printStackTrace();
+                        // skip this broken trip
                     }
                 }
 
@@ -86,6 +65,40 @@ public class TripController {
         return response;
     }
 
+    @GetMapping("/byOwner/{ownerEmail}")
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(
+            @PathVariable String ownerEmail) {
+
+        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+
+                for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+
+                    if (trip != null && ownerEmail.equals(trip.getOwnerEmail())) {
+                        trips.add(trip);
+                    }
+                }
+
+                response.setResult(ResponseEntity.ok(trips));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                );
+            }
+        });
+
+        return response;
+    }
+
+
     //we get the Trip by using the tripId
     //same ideas as above
     @GetMapping("/{tripid}")
@@ -93,7 +106,7 @@ public class TripController {
         //@PathVariable String tripid this will grab the tripId from the URL
         final DeferredResult<ResponseEntity<TripDTO>> response = new DeferredResult<>();
         dbRef.child(tripid).addListenerForSingleValueEvent(new ValueEventListener() {
-        //we point to a specific child in the database base on the id
+            //we point to a specific child in the database base on the id
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 response.setResult(ResponseEntity.ok(snapshot.getValue(TripDTO.class)));
@@ -117,6 +130,10 @@ public class TripController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 TripDTO trip = dataSnapshot.getValue(TripDTO.class);
+                if (trip == null) {
+                    response.setResult(ResponseEntity.notFound().build());
+                    return;
+                }
                 if(!trip.containsParticipant(email)) {
                     trip.addParticipant(email);
                     response.setResult(ResponseEntity.ok(createOrUpdateTrip(trip).getBody()));
@@ -135,19 +152,21 @@ public class TripController {
         return response;
     }
 
+
+
     @PostMapping("/create")
     public ResponseEntity<TripDTO> createOrUpdateTrip(@RequestBody TripDTO tripDTO) {
-       ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
+        ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
 
-       try {
-           future.get();
-           //wits for firebase to confirm the write
-           return ResponseEntity.ok(tripDTO);
-           //if succesfull return http 200 OK
-       }
-       catch (Exception e) {
+        try {
+            future.get();
+            //wits for firebase to confirm the write
+            return ResponseEntity.ok(tripDTO);
+            //if succesfull return http 200 OK
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             //if not ok return the http 500
-       }
+        }
     }
 }

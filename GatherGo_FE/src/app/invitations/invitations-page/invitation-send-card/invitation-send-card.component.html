@@ -3,7 +3,13 @@
 
     <div class="d-flex align-items-center mb-4">
       <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
-        <svg class="w-7 h-7 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="w-7 h-7 text-teal-600"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.6"
+             stroke-linecap="round"
+             stroke-linejoin="round">
           <!-- outer plane -->
           <path d="M3 11.8L21 3l-8.8 18-2.9-6.3L3 11.8z"/>
           <!-- inner diagonal crease -->
@@ -17,37 +23,45 @@
       <div>
         <mat-form-field class="w-100 mb-2">
           <mat-label>Enter user email</mat-label>
-          <input type='text' matInput formControlName="email">
-          <mat-error *ngIf="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched" >
+          <input type="text" matInput formControlName="email">
+          <mat-error *ngIf="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched">
             Invalid email
           </mat-error>
         </mat-form-field>
 
-        <mat-autocomplete #tripAutocomplete="matAutocomplete" [displayWith]="displayTrip">
-          <mat-option *ngFor="let trip of tripOptions" [value]="trip">
+        <mat-autocomplete
+          #tripAutocomplete="matAutocomplete"
+          [displayWith]="displayTrip">
+
+          <mat-option *ngFor="let trip of trips" [value]="trip">
             {{ trip.name ? trip.name : 'UnnamedAdventure' }}
           </mat-option>
+
         </mat-autocomplete>
 
         <mat-form-field class="w-100 mb-2">
           <mat-label>Select a trip</mat-label>
           <input type="text"
-                 aria-label="Number"
                  matInput
                  formControlName="trip"
                  [matAutocomplete]="tripAutocomplete">
-          <mat-error *ngIf="inviteForm.get('trip')?.invalid && inviteForm.get('trip')?.touched" >
+
+          <mat-error *ngIf="inviteForm.get('trip')?.invalid && inviteForm.get('trip')?.touched">
             Please select a trip
           </mat-error>
         </mat-form-field>
       </div>
 
-      <button class="w-100 fs-4 px-4 py-3 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all">
+      <button
+        type="submit"
+        class="w-100 fs-4 px-4 py-3 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all">
         Send Invitation
       </button>
-      <div *ngIf="errorString" class="invalid">{{errorString}}</div>
+
+      <div *ngIf="errorString" class="invalid">
+        {{ errorString }}
+      </div>
     </form>
 
   </div>
 </div>
-

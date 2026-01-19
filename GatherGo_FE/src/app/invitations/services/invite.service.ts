@@ -20,8 +20,16 @@ export class InviteService {
   }
 
   public createInvite(invite: InviteDto) {
-    invite.uuid = crypto.randomUUID();
-
-    return this.http.post<InviteDto>(this.url, invite);
+  return this.http.post<InviteDto>(this.url, invite);
   }
+
+  public acceptInvite(inviteId: string) {
+  return this.http.patch(`${this.url}/${inviteId}/accept`, {});
+}
+
+public rejectInvite(inviteId: string) {
+  return this.http.patch(`${this.url}/${inviteId}/reject`, {});
+}
+
+
 }
