@@ -172,6 +172,7 @@ public class TripController {
                     response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
                     return;
                 }
+                System.out.println("EDIT CHECK FAIL: uuid=" + uuid + " email=" + email+ " owner=" + trip.getOwnerEmail()+ " participants=" + trip.getParticipants());
 
                 if (item == null || item.trim().isEmpty()) {
                     response.setResult(ResponseEntity.badRequest().build());
