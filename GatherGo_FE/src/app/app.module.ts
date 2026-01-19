@@ -23,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
+import {DashboardComponent} from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     HomeComponent,
     ProfileComponent,
     NavigationComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,

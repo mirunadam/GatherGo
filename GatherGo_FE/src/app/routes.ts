@@ -4,12 +4,14 @@ import {LoginComponent} from "./login/login.component";
 import {RegisterComponent} from "./register/register.component";
 import { ProfileComponent } from "./profile/profile.component";
 import { InvitationsComponent } from "./invitations/invitations-page/invitations.component";
+import {DashboardComponent} from './dashboard/dashboard.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, //redirectTo: '/login', pathMatch: 'full'
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'dashboard', component: DashboardComponent},
   {
     path: 'trip',
     loadComponent: () => import('./trips/feature-trip-list/feature-trip-list.component').then(m => m.FeatureTripListComponent),

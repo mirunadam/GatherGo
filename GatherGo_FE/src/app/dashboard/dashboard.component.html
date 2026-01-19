@@ -1,0 +1,122 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-4xl text-gray-800 mb-2">
+      Welcome back<span *ngIf="userName">, {{ userName }}</span>!
+    </h1>
+    <p class="text-gray-600">Here are all trips created by you</p>
+  </div>
+
+  <!-- Loading / Error -->
+  <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <p class="text-gray-600">Loading your trips...</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMsg" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <p class="text-red-600">{{ errorMsg }}</p>
+    <div class="mt-4 flex gap-3">
+      <button (click)="loadTrips()" class="px-4 py-2 bg-teal-500 text-white rounded-lg">Retry</button>
+      <button (click)="goBack()" class="px-4 py-2 border rounded-lg">Back</button>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !errorMsg">
+
+    <!-- Create Trip Button -->
+    <div class="mb-8">
+      <button
+        (click)="onCreateTrip()"
+        class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all shadow-md"
+      >
+        + Create New Trip
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-2xl shadow-md p-6">
+        <p class="text-gray-600 mb-1">Total Trips</p>
+        <p class="text-3xl text-gray-800">{{ myTrips.length }}</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-md p-6">
+        <p class="text-gray-600 mb-1">Upcoming</p>
+        <p class="text-3xl text-gray-800">{{ upcomingCount(myTrips) }}</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-md p-6">
+        <p class="text-gray-600 mb-1">Total Photos</p>
+        <p class="text-3xl text-gray-800">{{ totalPhotos(myTrips) }}</p>
+      </div>
+    </div>
+
+    <!-- Trips Grid -->
+    <div>
+      <h2 class="text-2xl text-gray-800 mb-6">Your Trips</h2>
+
+      <div *ngIf="myTrips.length === 0" class="bg-white rounded-2xl shadow-md p-12 text-center">
+        <p class="text-gray-600 mb-4">You haven't created any trips yet</p>
+        <button
+          (click)="onCreateTrip()"
+          class="px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all"
+        >
+          Create Your First Trip
+        </button>
+      </div>
+
+      <div *ngIf="myTrips.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          *ngFor="let t of myTrips"
+          class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+          (click)="onViewTrip(t)"
+        >
+          <!-- Image -->
+          <div class="relative h-48 overflow-hidden">
+            <img
+              [src]="t.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80'"
+              class="w-full h-full object-cover"
+              alt="Trip cover"
+            />
+
+            <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs"
+                 [ngClass]="getStatusBadgeClass(getStatus(t))">
+              {{ getStatus(t) }}
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="p-6">
+            <h3 class="text-xl text-gray-800 mb-3">
+              {{ t.itinerary || 'Unnamed Trip' }}
+            </h3>
+
+            <div class="space-y-2 mb-4 text-gray-600">
+              <div>
+                <span class="font-medium text-gray-700">Dates:</span>
+                {{ t.dateStart | date }} - {{ t.dateEnd | date }}
+              </div>
+
+              <div>
+                <span class="font-medium text-gray-700">Budget:</span>
+                {{ t.budget }} {{ t.currency }}
+              </div>
+
+              <div>
+                <span class="font-medium text-gray-700">Participants:</span>
+                {{ (t.participants?.length ?? 0) }}
+              </div>
+            </div>
+
+            <button
+              (click)="$event.stopPropagation(); onViewTrip(t)"
+              class="w-full py-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white rounded-lg hover:from-teal-600 hover:to-blue-600 transition-all"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
