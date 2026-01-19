@@ -49,7 +49,7 @@ export class TripFormComponent implements OnInit {
   currencyCodes = currencyCodeItems;
   selectedFile: File | null = null;
   imagePreviewUrl: string | null | undefined = null;
-  
+
   //Mara
   multipleFiles: File[] = [];
   multipleImagePreviewUrls: string[] = [];
@@ -62,6 +62,7 @@ export class TripFormComponent implements OnInit {
 
   tripForm = this.fb.group({
     location: [null as PointDtoModel | null, [Validators.required]],
+    name: [null as string | null, [Validators.required]],
     ownerEmail: [null as string | null, [Validators.required]],
     dateStart: [null as Date | null, [Validators.required]],
     dateEnd: [null as Date | null, [Validators.required]],
@@ -179,13 +180,13 @@ export class TripFormComponent implements OnInit {
   }
 
   removePhoto(index: number){
-    this.multipleFiles.splice(index,1); 
+    this.multipleFiles.splice(index,1);
     this.multipleImagePreviewUrls.splice(index,1);
     this.extraImages.splice(index,1);
   }
 
   private uploadExtraPhotos():Observable<string[]>{
-      if (this.multipleFiles.length === 0){
+      if (this.multipleFiles.length === 0) {
         return of(this.extraImages);
       }
 
@@ -213,6 +214,7 @@ export class TripFormComponent implements OnInit {
     const trip: TripDto = {
       uuid: this.editUuid ?? crypto.randomUUID(),
       ownerEmail: this.tripForm.value.ownerEmail,
+      name: this.tripForm.value.name,
       location: this.tripForm.value.location,
       dateStart: this.tripForm.value.dateStart,
       dateEnd: this.tripForm.value.dateEnd,
@@ -221,9 +223,9 @@ export class TripFormComponent implements OnInit {
       maxPeople: this.tripForm.value.maxPeople,
       itinerary: this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
-      imageURL: mainImageUrl,
-      imageURLs: extraImages,
-      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
+      imageURL: mainImageUrl ?? this.imagePreviewUrl,
+      imageURLs: extraImages ?? this.extraImages,
+      isPublic: this.userData?.role === UserRole.AGENCY ? (this.tripForm.value.isPublic ?? false) : false,
       participants: this.tripForm.value.participants ?? []
     }
 

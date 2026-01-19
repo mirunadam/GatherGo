@@ -16,6 +16,10 @@ export class TripService {
     return this.http.get<TripDto[]>(this.url);
   }
 
+  public getAllTripsByOwner(ownerEmail: string ) {
+    return this.http.get<TripDto[]>(this.url + `/byOwner/${ownerEmail}`)
+  }
+
   public getTripByUuid(uuid: string) {
     return this.http.get<TripDto>(this.url + `/${uuid}`);
   }
@@ -33,4 +37,12 @@ export class TripService {
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }
+
+  public addParticipant(tripUuid: string, email: string) {
+  return this.http.post(
+    this.url + `/addParticipant?uuid=${tripUuid}&email=${email}`,
+    null
+  );
+}
+
 }
