@@ -25,39 +25,42 @@ public class TripController {
     //this @GetMapping() will send a request of type GET/api/trips
     //because Firebase works asynchronously (it doesn’t return immediately
     public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTrips() {
-        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+        DeferredResult<ResponseEntity<List<TripDTO>>> response =
+                new DeferredResult<>(10_000L);
 
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        response.onTimeout(() -> {
+            response.setResult(ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).build());
+        });
+
+        response.onError((Throwable t) -> {
+            t.printStackTrace();
+            response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        });
+
+        Query q = dbRef.limitToLast(20);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+            //this function will run when the Firebase will successfully fetch data
+            //snapshot will contain all the trips from the FireBase
                 List<TripDTO> trips = new ArrayList<>();
-
                 for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
-                    try {
-                        TripDTO trip = tripSnapshot.getValue(TripDTO.class);
-
-                        if (trip == null) {
-                            System.err.println("Trip is null (failed mapping) for key=" + tripSnapshot.getKey());
-                            continue;
-                        }
-
-                        if (trip.getUuid() == null) {
-                            trip.setUuid(tripSnapshot.getKey());
-                        }
-
-                        trips.add(trip);
-                    } catch (Exception e) {
-                        System.err.println("Failed to map trip key=" + tripSnapshot.getKey() + " error=" + e.getMessage());
-                        e.printStackTrace();
-                        // skip this broken trip
-                    }
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    trips.add(trip);
                 }
 
                 response.setResult(ResponseEntity.ok(trips));
+                //when everything is ok we can send the list of trips as Json with http200 which means everything was ok
             }
 
+            //if something failed we return a http500 to the frontend
             @Override
             public void onCancelled(DatabaseError error) {
+                System.err.println("Firebase cancelled: code=" + error.getCode()
+                        + " message=" + error.getMessage());
+                if (error.toException() != null) {
+                    error.toException().printStackTrace();
+                }
                 response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
             }
         });
@@ -68,7 +71,9 @@ public class TripController {
     @GetMapping("/byOwner/{ownerEmail}")
     public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(@PathVariable String ownerEmail) {
         final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        Query q = dbRef.limitToLast(10);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 List<TripDTO> trips = new ArrayList<>();

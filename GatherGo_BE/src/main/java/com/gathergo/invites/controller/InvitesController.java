@@ -19,7 +19,8 @@ public class InvitesController {
     @GetMapping()
     public DeferredResult<ResponseEntity<List<InviteDto>>> getAllInvites() {
         final DeferredResult<ResponseEntity<List<InviteDto>>> response = new DeferredResult<>();
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query q = dbRef.limitToLast(15);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 List<InviteDto> invites = new ArrayList<>();
@@ -46,7 +47,9 @@ public class InvitesController {
     @GetMapping("/sender/{email}")
     public DeferredResult<ResponseEntity<List<InviteDto>>> getAllInvitesBySenderEmail(@PathVariable String email) {
         final DeferredResult<ResponseEntity<List<InviteDto>>> response = new DeferredResult<>();
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        Query q = dbRef.limitToLast(20);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 List<InviteDto> invites = new ArrayList<>();
@@ -73,7 +76,9 @@ public class InvitesController {
     @GetMapping("/receiver/{email}")
     public DeferredResult<ResponseEntity<List<InviteDto>>> getAllInvitesByReceiverEmail(@PathVariable String email) {
         final DeferredResult<ResponseEntity<List<InviteDto>>> response = new DeferredResult<>();
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        Query q = dbRef.limitToLast(20);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 List<InviteDto> invites = new ArrayList<>();
