@@ -56,7 +56,7 @@ public class InvitesController {
 
                 for(DataSnapshot inviteSnapshot: snapshot.getChildren()) {
                     InviteDto invite = inviteSnapshot.getValue(InviteDto.class);
-                    if(invite.getSenderEmail().equals(email) && !invite.isDeleted()) {
+                    if(email.equals(invite.getSenderEmail()) && !invite.isDeleted()) {
                         invites.add(invite);
                     }
                 }
@@ -77,7 +77,7 @@ public class InvitesController {
     public DeferredResult<ResponseEntity<List<InviteDto>>> getAllInvitesByReceiverEmail(@PathVariable String email) {
         final DeferredResult<ResponseEntity<List<InviteDto>>> response = new DeferredResult<>();
 
-        Query q = dbRef.limitToLast(20);
+        Query q = dbRef.limitToLast(10);
         q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -85,7 +85,7 @@ public class InvitesController {
 
                 for(DataSnapshot inviteSnapshot: snapshot.getChildren()) {
                     InviteDto invite = inviteSnapshot.getValue(InviteDto.class);
-                    if(invite.getReceiverEmail().equals(email) && !invite.isDeleted()) {
+                    if(email.equals(invite.getReceiverEmail()) && !invite.isDeleted()) {
                         invites.add(invite);
                     }
                 }
