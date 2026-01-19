@@ -5,6 +5,9 @@ import { LoggedInContextService } from "../../../services/logged-in-context.serv
 import { InviteDto } from "../../domain/invite.dto";
 import { InviteStatus } from "../../domain/invite-status";
 import { MatButtonModule } from "@angular/material/button";
+import { TripService } from "../../../trips/services/trip.service";
+
+
 
 @Component({
   selector: 'app-invitations-received-card',
@@ -24,7 +27,8 @@ export class InvitationsReceivedCardComponent implements OnInit {
 
   constructor(
     private inviteService: InviteService,
-    private loggedInContext: LoggedInContextService
+    private loggedInContext: LoggedInContextService,
+    private tripService:TripService
   ) {}
 
   ngOnInit() {
@@ -43,7 +47,12 @@ export class InvitationsReceivedCardComponent implements OnInit {
 
   acceptInvite(invite: InviteDto) {
     invite.status = InviteStatus.ACCEPTED;
-    this.inviteService.updateInvite(invite).subscribe();
+    this.inviteService.updateInvite(invite).subscribe(() => {
+    if (invite.tripId && invite.receiverEmail) {
+      this.tripService.addParticipant(invite.tripId, invite.receiverEmail)
+        .subscribe();
+    }
+  });
   }
 
   rejectInvite(invite: InviteDto) {

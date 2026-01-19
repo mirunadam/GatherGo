@@ -16,7 +16,7 @@ public class FirebaseInitializer {
 //            FileInputStream serviceAccount =
 //                    new FileInputStream("GatherGo_BE/src/main/resources/gathergo-9da0b-firebase-adminsdk-fbsvc-955a5f33c4.json");
             InputStream serviceAccount = FirebaseInitializer.class.getClassLoader()
-                    .getResourceAsStream("gathergo-9da0b-firebase-adminsdk-fbsvc-955a5f33c4.json");
+                    .getResourceAsStream("mara");
 
             if (serviceAccount == null) {
                 System.err.println("CRITICAL: Firebase JSON file not found in resources folder!");
