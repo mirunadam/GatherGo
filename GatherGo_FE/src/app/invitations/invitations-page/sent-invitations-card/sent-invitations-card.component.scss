@@ -1,0 +1,12 @@
+.invitation-card {
+  width: 350px;
+  height: 120px;
+
+  .status-badge-container {
+    width: 100px;
+  }
+
+  .delete-button:hover {
+    color: red;
+  }
+}

@@ -1,0 +1,32 @@
+<div class="card">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-center mb-4">
+      <div class="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
+        <svg class="w-7 h-7 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <!-- outer plane -->
+          <path d="M3 11.8L21 3l-8.8 18-2.9-6.3L3 11.8z"/>
+          <!-- inner diagonal crease -->
+          <path d="M9.3 14.7L21 3"/>
+        </svg>
+      </div>
+      <div class="ms-2 h4 fw-normal mb-0">Sent Invitations</div>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <div *ngFor="let invite of invites" class="card invitation-card">
+        <div class="card-body">
+          <div class="d-flex justify-between">
+            <div class="h6">{{ invite.tripName ? invite.tripName : 'UnnamedAdventure'}}</div>
+            <div class="delete-button cursor-pointer" (click)="deleteInvite(invite)">
+              <mat-icon>delete</mat-icon>
+            </div>
+          </div>
+          <div>To: {{ invite.senderEmail }}</div>
+          <div class="mt-2 status-badge-container">
+            <app-invitations-status-badge [status]="invite.status"></app-invitations-status-badge>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
