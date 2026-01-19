@@ -1,0 +1,29 @@
+<div class="card mt-3 invitations-received-container">
+  <div class="card-body p-4">
+    <h4 class="mb-3">Received Invitations</h4>
+
+    <div *ngIf="invites.length === 0">
+      You have no invitations.
+    </div>
+
+    <div *ngFor="let invite of invites" class="invite-card mb-3">
+      <div>
+        <strong>From:</strong> {{ invite.senderEmail }}
+      </div>
+      <div>
+        <strong>Status:</strong> {{ invite.status }}
+      </div>
+
+      <div *ngIf="invite.status === 'PENDING'" class="mt-2">
+        <button class="btn btn-primary me-2"
+                (click)="acceptInvite(invite)">
+          Accept
+        </button>
+        <button class="btn btn-danger"
+                (click)="rejectInvite(invite)">
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

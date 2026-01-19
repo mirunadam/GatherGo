@@ -19,37 +19,70 @@ import java.util.List;
 public class TripController {
     DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("trips");
     //the connection to the database part we want to use
-    //we are connected to the ,,folder" trips in the database using this
+    //we are connected to the "folder" trips in the database using this
 
     @GetMapping()
     //this @GetMapping() will send a request of type GET/api/trips
     //because Firebase works asynchronously (it doesn’t return immediately
     public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTrips() {
-        //we get the list of trips wrapped in an HTTP response
-        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
-        //a container which will hold the responses
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-        //firebase call to get all trips under the trips node
-        //addListenerForSingleValueEvent->fetch data once not continuously
+        DeferredResult<ResponseEntity<List<TripDTO>>> response =
+                new DeferredResult<>(10_000L);
+
+        response.onTimeout(() -> {
+            response.setResult(ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).build());
+        });
+
+        response.onError((Throwable t) -> {
+            t.printStackTrace();
+            response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        });
+
+        Query q = dbRef.limitToLast(20);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-            //this function will run when the Firebase will successfully fetch data
-            //snapshot will contain all the trips from the FireBase
                 List<TripDTO> trips = new ArrayList<>();
-                //this was created to store trip objects
+                for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    trips.add(trip);
+                }
+                response.setResult(ResponseEntity.ok(trips));
+            }
 
-                //we will loop over all the child nodes in Firebase(the trips in my case)
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.err.println("Firebase cancelled: code=" + error.getCode()
+                        + " message=" + error.getMessage());
+                if (error.toException() != null) {
+                    error.toException().printStackTrace();
+                }
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
+    @GetMapping("/byOwner/{ownerEmail}")
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(@PathVariable String ownerEmail) {
+        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+
+        Query q = dbRef.limitToLast(10);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+
                 for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
                     TripDTO trip = tripSnapshot.getValue(TripDTO.class);
-                    //the json is converted into the TripDTO and then put in the trips list
-                    trips.add(trip);
+                    if(ownerEmail.equals(trip.getOwnerEmail())) {
+                        trips.add(trip);
+                    }
                 }
 
                 response.setResult(ResponseEntity.ok(trips));
-                //when everything is ok we can send the list of trips as Json with http200 which means everything was ok
             }
 
-            //if something failed we return a http500 to the frontend
             @Override
             public void onCancelled(DatabaseError error) {
                 response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());

@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
-
+// import { NgFor, NgIf } from '@angular/common';
+// import { NgModel } from '@angular/forms';
+// import { NgClass } from '@angular/common';
+// import { FormsModule } from '@angular/forms'
 
 // The simple interface your Landing Page HTML expects
 interface FrontendTrip {
@@ -35,7 +38,7 @@ const STATIC_TRIPS: FrontendTrip[] = [
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  
+
   // Google Maps Geocoder
   private geocoder = new google.maps.Geocoder();
 
@@ -90,9 +93,9 @@ export class HomeComponent implements OnInit {
     // Create the base object
     const frontendTrip: FrontendTrip = {
       id: dto.uuid,
-      name: dto.itinerary || 'Unnamed Adventure', // Use itinerary as name fallback
+      name: dto.name || 'Unnamed Adventure',
       location: 'Loading location...', // Placeholder while geocoding runs
-      agency: 'Community Trip', 
+      agency: 'Community Trip',
       price: dto.budget || 0,
       period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
       imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image

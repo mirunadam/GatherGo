@@ -1,61 +1,4 @@
 <div class="min-h-screen">
-  <header class="bg-white shadow-sm">
-    <div class="header-content">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="w-6 h-6 text-white"
-            >
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-          </div>
-
-          <h1 class="text-3xl text-gray-800">GatherGo</h1>
-        </div>
-
-        <div class="flex gap-3">
-            <ng-container *ngIf="!isLoggedIn">
-                <button
-                    (click)="onNavigate('login')"
-                    class="nav-btn nav-login"
-                >
-                    Login
-                </button>
-                <button
-                    (click)="onNavigate('register')"
-                    class="nav-btn nav-register"
-                >
-                    Register
-                </button>
-            </ng-container>
-
-            <ng-container *ngIf="isLoggedIn">
-                <button
-                    (click)="onNavigate('profile')"
-                    class="nav-btn nav-logout"
-                >
-                    {{this.userName}}
-                </button>
-                <button
-                    (click)="logout()"
-                    class="nav-btn nav-logout"
-                >
-                    Logout
-                </button>
-            </ng-container>
-        </div>
-      </div>
-    </div>
-  </header>
 
   <section class="hero-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -84,7 +27,7 @@
   <section class="search-filters max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
     <div class="bg-white rounded-2xl shadow-xl p-6">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        
+
         <div class="md:col-span-1">
           <label class="block text-sm text-gray-600 mb-2">Search Trips</label>
           <div class="relative">
@@ -96,20 +39,6 @@
               placeholder="Trip name or destination..."
               [(ngModel)]="searchTerm"
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm text-gray-600 mb-2">Location</label>
-          <div class="relative">
-            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            </div>
-            <input
-              type="text"
-              placeholder="Filter by location..."
-              [(ngModel)]="locationFilter"
             />
           </div>
         </div>
@@ -234,3 +163,4 @@
       </div>
     </div>
   </section>
+</div>
