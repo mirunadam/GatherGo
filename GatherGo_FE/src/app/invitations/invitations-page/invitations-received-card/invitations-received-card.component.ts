@@ -6,6 +6,7 @@ import { InviteDto } from "../../domain/invite.dto";
 import { InviteStatus } from "../../domain/invite-status";
 import { MatButtonModule } from "@angular/material/button";
 import { TripService } from "../../../trips/services/trip.service";
+import {InvitationsStatusBadgeComponent} from "../invitations-status-badge/invitations-status-badge.component";
 
 
 
@@ -15,7 +16,8 @@ import { TripService } from "../../../trips/services/trip.service";
   imports: [
     NgForOf,
     NgIf,
-    MatButtonModule
+    MatButtonModule,
+    InvitationsStatusBadgeComponent
   ],
   templateUrl: './invitations-received-card.component.html',
   styleUrls: ['./invitations-received-card.component.scss']
@@ -58,6 +60,9 @@ export class InvitationsReceivedCardComponent implements OnInit {
   rejectInvite(invite: InviteDto) {
     invite.status = InviteStatus.REJECTED;
     this.inviteService.updateInvite(invite).subscribe();
+  }
+  clearResponded(){
+    
   }
 
   protected readonly InviteStatus = InviteStatus;
