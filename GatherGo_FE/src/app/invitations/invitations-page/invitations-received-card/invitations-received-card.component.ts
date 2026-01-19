@@ -5,6 +5,10 @@ import { LoggedInContextService } from "../../../services/logged-in-context.serv
 import { InviteDto } from "../../domain/invite.dto";
 import { InviteStatus } from "../../domain/invite-status";
 import { MatButtonModule } from "@angular/material/button";
+import { TripService } from "../../../trips/services/trip.service";
+import {InvitationsStatusBadgeComponent} from "../invitations-status-badge/invitations-status-badge.component";
+
+
 
 @Component({
   selector: 'app-invitations-received-card',
@@ -12,7 +16,8 @@ import { MatButtonModule } from "@angular/material/button";
   imports: [
     NgForOf,
     NgIf,
-    MatButtonModule
+    MatButtonModule,
+    InvitationsStatusBadgeComponent
   ],
   templateUrl: './invitations-received-card.component.html',
   styleUrls: ['./invitations-received-card.component.scss']
@@ -24,7 +29,8 @@ export class InvitationsReceivedCardComponent implements OnInit {
 
   constructor(
     private inviteService: InviteService,
-    private loggedInContext: LoggedInContextService
+    private loggedInContext: LoggedInContextService,
+    private tripService:TripService
   ) {}
 
   ngOnInit() {
@@ -43,12 +49,20 @@ export class InvitationsReceivedCardComponent implements OnInit {
 
   acceptInvite(invite: InviteDto) {
     invite.status = InviteStatus.ACCEPTED;
-    this.inviteService.updateInvite(invite).subscribe();
+    this.inviteService.updateInvite(invite).subscribe(() => {
+    if (invite.tripId && invite.receiverEmail) {
+      this.tripService.addParticipant(invite.tripId, invite.receiverEmail)
+        .subscribe();
+    }
+  });
   }
 
   rejectInvite(invite: InviteDto) {
     invite.status = InviteStatus.REJECTED;
     this.inviteService.updateInvite(invite).subscribe();
+  }
+  clearResponded(){
+    
   }
 
   protected readonly InviteStatus = InviteStatus;
