@@ -160,9 +160,64 @@
         </div>
 
         <!-- ACTIVITIES -->
+        <div *ngIf="activeTab === 'activities'">
+
+          <div class="flex items-start justify-between mb-4">
+            <!-- Add button -->
+            <button
+              (click)="showActivityForm = !showActivityForm"
+              [disabled]="!isMember(t)"
+              class="mb-0 bg-teal-500 text-white px-4 py-2 rounded"
+              [ngClass]="!isMember(t) ? 'opacity-50 cursor-not-allowed' : ''"
+            >
+              {{ showActivityForm ? 'Close' : 'Add Activity' }}
+            </button>
+
+            <p *ngIf="!isMember(t)" class="text-sm text-gray-500 ml-4">
+              Join the trip to add activities.
+            </p>
+          </div>
+
+          <!-- Add activity form (only if member) -->
+          <form
+            *ngIf="showActivityForm && isMember(t)"
+            (ngSubmit)="addActivity()"
+            class="space-y-3"
+          >
+            <label class="block text-sm text-gray-600">Activity</label>
+
+            <textarea
+              [(ngModel)]="newActivity"
+              name="newActivity"
+              placeholder="e.g. 2026-01-21 15:30 - Hiking in the mountains"
+              class="w-full border rounded px-3 py-2"
+              rows="3"
+              required
+            ></textarea>
+
+            <button class="bg-teal-500 text-white px-4 py-2 rounded">
+              Save
+            </button>
+          </form>
+
+          <!-- Activities display -->
+          <div class="mt-6 bg-gray-50 p-4 rounded">
+            <ng-container *ngIf="t.itinerary && t.itinerary.trim(); else noActs">
+              <div class="whitespace-pre-wrap text-gray-800">
+                {{ t.itinerary }}
+              </div>
+            </ng-container>
+
+            <ng-template #noActs>
+              <p class="text-gray-600">No activities yet.</p>
+            </ng-template>
+          </div>
+
+        </div>
+
+        <!-- ACTIVITIES
           <div *ngIf="activeTab === 'activities'">
 
-            <!-- Add button -->
             <button
               (click)="showActivityForm = !showActivityForm"
               class="mb-4 bg-teal-500 text-white px-4 py-2 rounded"
@@ -170,7 +225,7 @@
               {{ showActivityForm ? 'Close' : 'Add Activity' }}
             </button>
 
-            <!-- Add activity form -->
+           
             <form
               *ngIf="showActivityForm"
               (ngSubmit)="addActivity()"
@@ -192,10 +247,9 @@
               </button>
             </form>
 
-            <!-- Activities display -->
             <div class="mt-6 bg-gray-50 p-4 rounded">
               <ng-container *ngIf="t.itinerary && t.itinerary.trim(); else noActs">
-                <!-- whitespace-pre-wrap preserves \n -->
+      
                 <div class="whitespace-pre-wrap text-gray-800">
                   {{ t.itinerary }}
                 </div>
@@ -206,7 +260,7 @@
               </ng-template>
             </div>
 
-          </div>
+          </div> -->
 
         <!-- <div *ngIf="activeTab === 'activities'">
           <button
@@ -254,7 +308,6 @@
           </div>
         </div> -->
 
-        <!-- ACCOMMODATIONS (local UI mock for now) -->
         <!-- ACCOMMODATIONS -->
 <div *ngIf="activeTab === 'accommodations'">
 
