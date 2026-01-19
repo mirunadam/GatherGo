@@ -193,4 +193,17 @@ public class TripDTO {
     public void setImageURLs(List<String> imageURLs){
         this.imageURLs=imageURLs;
     }
+
+    public boolean containsImageUrl(String url) {
+        if (url == null) return false;
+        String u = url.trim();
+        return getImageURLs().stream().anyMatch(x -> x != null && x.trim().equalsIgnoreCase(u));
+    }
+
+    public void addImageUrl(String url) {
+        if (url == null || url.isBlank()) return;
+        if (!containsImageUrl(url)) {
+            getImageURLs().add(url.trim());
+        }
+    }
 }

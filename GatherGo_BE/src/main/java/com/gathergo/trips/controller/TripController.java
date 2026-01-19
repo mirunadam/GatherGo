@@ -227,6 +227,51 @@ public class TripController {
         return response;
     }
 
+    @PostMapping("/addImageUrl")
+    public DeferredResult<ResponseEntity<TripDTO>> addImageUrl(
+            @RequestParam("uuid") String uuid,
+            @RequestParam("email") String email,
+            @RequestParam("url") String url
+    ) {
+        final DeferredResult<ResponseEntity<TripDTO>> response = new DeferredResult<>();
+
+        dbRef.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                TripDTO trip = dataSnapshot.getValue(TripDTO.class);
+                if (trip == null) {
+                    response.setResult(ResponseEntity.notFound().build());
+                    return;
+                }
+
+                // permission check (same logic as itinerary/accommodation)
+                if (!trip.canEditTrip(email)) {
+                    response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+                    return;
+                }
+
+                if (url == null || url.trim().isEmpty()) {
+                    response.setResult(ResponseEntity.badRequest().build());
+                    return;
+                }
+
+                if (!trip.containsImageUrl(url)) {
+                    trip.addImageUrl(url);
+                    response.setResult(ResponseEntity.ok(createOrUpdateTrip(trip).getBody()));
+                } else {
+                    response.setResult(ResponseEntity.ok(trip));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
     @PostMapping("/create")
     public ResponseEntity<TripDTO> createOrUpdateTrip(@RequestBody TripDTO tripDTO) {
        ApiFuture<Void> future = this.dbRef.child(tripDTO.getUuid()).setValueAsync(tripDTO);
