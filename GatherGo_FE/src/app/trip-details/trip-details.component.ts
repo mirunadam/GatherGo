@@ -165,19 +165,55 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
+    if (!this.trip) return;
 
-    this.getUserEmail$()
-      .pipe(switchMap(email => this.tripService.addParticipantToTrip(tripUuid, email)))
-      .subscribe({
-        next: (updatedTrip) => {
-          // ✅ best: use backend response as source of truth
-          this.trip = updatedTrip;
-        },
-        error: (err) => {
-          console.error('Failed to join trip', err);
-          this.errorMsg = 'Failed to join trip.';
+    this.getUserEmail$().subscribe({
+      next: (email) => {
+        const prev = [...(this.trip!.participants ?? [])];
+
+        const alreadyIn =
+          this.trip!.ownerEmail?.toLowerCase() === email.toLowerCase() ||
+          (this.trip!.participants ?? []).some(p => p.toLowerCase() === email.toLowerCase());
+
+        if (!alreadyIn) {
+          (this.trip!.participants ??= []).push(email);
         }
-      });
+
+        this.errorMsg = null;
+
+        this.tripService.addParticipantToTrip(tripUuid, email).subscribe({
+          next: (updatedTrip) => {
+            this.trip = updatedTrip;
+
+            //force refresh from DB to be 100% sure
+            this.refreshTrip();
+          },
+          error: (err) => {
+            console.error('Failed to join trip', err);
+            //revert optimistic update if backend fails
+            if (this.trip) this.trip.participants = prev;
+
+            this.errorMsg = 'Failed to join trip.';
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Could not resolve user email', err);
+        this.errorMsg = 'Could not resolve user email.';
+      }
+    });
+
+    // this.getUserEmail$()
+    //   .pipe(switchMap(email => this.tripService.addParticipantToTrip(tripUuid, email)))
+    //   .subscribe({
+    //     next: (updatedTrip) => {
+    //       this.trip = updatedTrip;
+    //     },
+    //     error: (err) => {
+    //       console.error('Failed to join trip', err);
+    //       this.errorMsg = 'Failed to join trip.';
+    //     }
+    //   });
   }
 
   addActivity() {
