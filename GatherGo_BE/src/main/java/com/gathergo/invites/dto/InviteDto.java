@@ -3,6 +3,7 @@ package com.gathergo.invites.dto;
 public class InviteDto {
     private String uuid;
     private String tripId;
+    private String tripName;
     private String senderEmail;
     private String receiverEmail;
     private InviteStatus status;
@@ -56,5 +57,13 @@ public class InviteDto {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public String getTripName() {
+        return tripName;
+    }
+
+    public void setTripName(String tripName) {
+        this.tripName = tripName;
     }
 }

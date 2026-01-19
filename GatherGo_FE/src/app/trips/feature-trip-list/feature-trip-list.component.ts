@@ -5,6 +5,7 @@ import {NgForOf} from "@angular/common";
 import {TripViewCardComponent} from "./trip-view-card/trip-view-card.component";
 import {MatButtonModule} from "@angular/material/button";
 import {Router} from "@angular/router";
+import {LoggedInContextService} from "../../services/logged-in-context.service";
 
 @Component({
   selector: 'app-feature-trip-list',
@@ -21,14 +22,15 @@ export class FeatureTripListComponent implements OnInit{
   geocoder = new google.maps.Geocoder;
   tripsWithCity: {trip: TripDto, city: string}[] = [];
 
-  constructor(private tripService: TripService, private router: Router) {
+  constructor(private tripService: TripService, private router: Router, private loggedInContext: LoggedInContextService) {
 
   }
 
   ngOnInit() {
-    const email = localStorage.getItem('email');
+    this.loggedInContext.getUserData().subscribe(userData => {
+      const email = userData.email;
 
-    this.tripService.getAllTrips().subscribe((res) => {
+      this.tripService.getAllSpecificTrips(email).subscribe((res) => {
         this.tripsWithCity = res.map((trip) => {
           return {
             trip: trip,
@@ -36,7 +38,7 @@ export class FeatureTripListComponent implements OnInit{
           }
         });
 
-      this.tripsWithCity = this.tripsWithCity.map((tripWithCity) => {
+        this.tripsWithCity = this.tripsWithCity.map((tripWithCity) => {
           const location = {lat: tripWithCity.trip.location?.latitude ?? 0, lng: tripWithCity.trip.location?.longitude ?? 0};
           this.geocoder.geocode({ location: location}, (results, status) => {
             if (status === 'OK' && results && results[0]) {
@@ -48,10 +50,11 @@ export class FeatureTripListComponent implements OnInit{
 
         console.log(this.tripsWithCity);
 
-      this.tripsWithCity = this.tripsWithCity.filter((tripWithCity) => {
-        return tripWithCity.trip.isPublic || tripWithCity.trip.ownerEmail === email
-      })
-    })
+        this.tripsWithCity = this.tripsWithCity.filter((tripWithCity) => {
+          return tripWithCity.trip.isPublic || tripWithCity.trip.ownerEmail === email
+        })
+      });
+    });
   }
 
   private extractCityAndCountry(result: google.maps.GeocoderResult) {

@@ -71,15 +71,15 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     this.errorMsg = null;
 
-    this.tripService.getAllTrips().subscribe({
-      next: (dtos) => {
+    this.tripService.getAllSpecificTrips(this.userEmail!).subscribe({
+      next: (dtos:any) => {
         this.allTrips = dtos ?? [];
         const email = this.userEmail ?? '';
         this.myTrips = this.allTrips.filter(t => (t.ownerEmail ?? '') === email);
 
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err:any) => {
         console.error('Failed to load trips', err);
         this.errorMsg = 'Failed to load trips.';
         this.isLoading = false;
