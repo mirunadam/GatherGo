@@ -17,8 +17,9 @@ public class TripDTO {
     private int budget;
     private CurrencyCode currency;
     private int maxPeople;
-    private List<String> itinerary;
-    private List<String> accommodation;
+    private String itinerary;
+    private String accommodation;
+    private List<String> accommodationSuggestions;
     private String imageURL;//main trip Image
     private boolean isPublic;
     //Mara
@@ -85,30 +86,43 @@ public class TripDTO {
         this.maxPeople = maxPeople;
     }
 
-    public List<String> getItinerary() {
+    public String getItinerary() {
         return itinerary;
     }
 
-    public void setItinerary(List<String> itinerary) {
+    public void setItinerary(String itinerary) {
         this.itinerary = itinerary;
     }
 
     public void addItinerary(String item) {
-        if (itinerary == null) itinerary = new ArrayList<>();
-        itinerary.add(item);
+        if (item == null || item.isBlank()) return;
+        if (itinerary == null || itinerary.isBlank()) {
+            itinerary = item.trim();
+        } else {
+            itinerary = itinerary + "\n" + item.trim();
+        }
     }
 
-    public List<String> getAccommodation() {
+    public String getAccommodation() {
         return accommodation;
     }
 
-    public void setAccommodation(List<String> accommodation) {
+    public void setAccommodation(String accommodation) {
         this.accommodation = accommodation;
     }
 
+    public List<String> getAccommodationSuggestions() {
+        if (accommodationSuggestions == null) accommodationSuggestions = new ArrayList<>();
+        return accommodationSuggestions;
+    }
+
+    public void setAccommodationSuggestions(List<String> accommodationSuggestions) {
+        this.accommodationSuggestions = accommodationSuggestions;
+    }
+
     public void addAccommodation(String item) {
-        if (accommodation == null) accommodation = new ArrayList<>();
-        accommodation.add(item);
+        if (item == null || item.isBlank()) return;
+        getAccommodationSuggestions().add(item);
     }
 
     public boolean canEditTrip(String email) {
