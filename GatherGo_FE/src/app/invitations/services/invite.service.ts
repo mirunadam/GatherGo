@@ -24,4 +24,8 @@ export class InviteService {
 
     return this.http.post<InviteDto>(this.url, invite);
   }
+
+  public updateInvite(invite: InviteDto) {
+    return this.http.post<InviteDto>(this.url, invite);
+  }
 }

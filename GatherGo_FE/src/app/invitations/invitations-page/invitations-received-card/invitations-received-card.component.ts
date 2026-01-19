@@ -43,12 +43,12 @@ export class InvitationsReceivedCardComponent implements OnInit {
 
   acceptInvite(invite: InviteDto) {
     invite.status = InviteStatus.ACCEPTED;
-    this.inviteService.createInvite(invite).subscribe();
+    this.inviteService.updateInvite(invite).subscribe();
   }
 
   rejectInvite(invite: InviteDto) {
     invite.status = InviteStatus.REJECTED;
-    this.inviteService.createInvite(invite).subscribe();
+    this.inviteService.updateInvite(invite).subscribe();
   }
 
   protected readonly InviteStatus = InviteStatus;
