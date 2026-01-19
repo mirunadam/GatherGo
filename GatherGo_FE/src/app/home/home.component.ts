@@ -76,7 +76,7 @@ export class HomeComponent implements OnInit {
 
   loadRealTrips(): void {
     // 1. Fetch Real Trips from Backend
-    this.tripService.getAllTrips().subscribe({
+    this.tripService.getAllPublicTrips().subscribe({
       next: (dtos: TripDto[]) => {
         // 2. Convert Backend DTOs to Frontend UI Models
         const mappedTrips = dtos.map(dto => this.mapTripDtoToFrontendModel(dto));
@@ -144,6 +144,7 @@ export class HomeComponent implements OnInit {
 
   get filteredTrips(): FrontendTrip[] {
     return this.allTrips.filter(trip => {
+
       const search = this.searchTerm.toLowerCase();
       const locFilter = this.locationFilter.toLowerCase();
       const agFilter = this.agencyFilter.toLowerCase();
