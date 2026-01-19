@@ -63,6 +63,77 @@ public class TripController {
         return response;
     }
 
+    @GetMapping("/public")
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllPublicTrips() {
+        DeferredResult<ResponseEntity<List<TripDTO>>> response =
+                new DeferredResult<>(10_000L);
+
+        response.onTimeout(() -> {
+            response.setResult(ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).build());
+        });
+
+        response.onError((Throwable t) -> {
+            t.printStackTrace();
+            response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        });
+
+        Query q = dbRef.limitToLast(20);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+                for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    if(trip.isPublic()) {
+                        trips.add(trip);
+                    }
+                }
+                response.setResult(ResponseEntity.ok(trips));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.err.println("Firebase cancelled: code=" + error.getCode()
+                        + " message=" + error.getMessage());
+                if (error.toException() != null) {
+                    error.toException().printStackTrace();
+                }
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
+    @GetMapping("/specific/{email}")
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsSpecific(@PathVariable String email) {
+        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+
+        Query q = dbRef.limitToLast(10);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+
+                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    if(email.equals(trip.getOwnerEmail()) || trip.containsParticipant(email)) {
+                        trips.add(trip);
+                    }
+                }
+
+                response.setResult(ResponseEntity.ok(trips));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
     @GetMapping("/byOwner/{ownerEmail}")
     public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(@PathVariable String ownerEmail) {
         final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
