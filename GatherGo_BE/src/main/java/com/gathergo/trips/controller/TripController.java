@@ -11,7 +11,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
 //class handles http requests and returns JSON responses
 @RestController
 //all endpoints in this class will start with /api/trips
@@ -25,31 +25,37 @@ public class TripController {
     //this @GetMapping() will send a request of type GET/api/trips
     //because Firebase works asynchronously (it doesn’t return immediately
     public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTrips() {
-        //we get the list of trips wrapped in an HTTP response
         final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
-        //a container which will hold the responses
+
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-        //firebase call to get all trips under the trips node
-        //addListenerForSingleValueEvent->fetch data once not continuously
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-            //this function will run when the Firebase will successfully fetch data
-            //snapshot will contain all the trips from the FireBase
                 List<TripDTO> trips = new ArrayList<>();
-                //this was created to store trip objects
 
-                //we will loop over all the child nodes in Firebase(the trips in my case)
-                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
-                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
-                    //the json is converted into the TripDTO and then put in the trips list
-                    trips.add(trip);
+                for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
+                    try {
+                        TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+
+                        if (trip == null) {
+                            System.err.println("Trip is null (failed mapping) for key=" + tripSnapshot.getKey());
+                            continue;
+                        }
+
+                        if (trip.getUuid() == null) {
+                            trip.setUuid(tripSnapshot.getKey());
+                        }
+
+                        trips.add(trip);
+                    } catch (Exception e) {
+                        System.err.println("Failed to map trip key=" + tripSnapshot.getKey() + " error=" + e.getMessage());
+                        e.printStackTrace();
+                        // skip this broken trip
+                    }
                 }
 
                 response.setResult(ResponseEntity.ok(trips));
-                //when everything is ok we can send the list of trips as Json with http200 which means everything was ok
             }
 
-            //if something failed we return a http500 to the frontend
             @Override
             public void onCancelled(DatabaseError error) {
                 response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
