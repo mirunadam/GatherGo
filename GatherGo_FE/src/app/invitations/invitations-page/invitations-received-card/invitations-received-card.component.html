@@ -2,11 +2,8 @@
   <div class="card-body p-4">
   <div class="d-flex align-items-center justify-between">
       <div class="d-flex align-items-center mb-4">
-      <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+      <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
-          <!-- Background circle -->
-          <circle cx="48" cy="48" r="32" fill="#D9E8FF"/>
-
           <!-- Envelope -->
           <g stroke="#1E5BFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
             <!-- Outer envelope shape -->
@@ -18,7 +15,7 @@
       </div>
       <div class="ms-2 h4 fw-normal mb-0">Send Invitation</div>
     </div>
-    <div (click)="clearResponded()" class="pb-2">
+    <div (click)="clearResponded()" class="pb-2 cursor-pointer">
       Clear responded
     </div>
   </div>
@@ -30,7 +27,7 @@
       <div class="card-body">
         <div class="d-flex align-items-center justify-between">
           <div class="from">
-            <strong >{{ invite.tripName }}</strong> 
+            <strong >{{ invite.tripName }}</strong>
           </div>
           <div>
             <app-invitations-status-badge [status]="invite.status"></app-invitations-status-badge>

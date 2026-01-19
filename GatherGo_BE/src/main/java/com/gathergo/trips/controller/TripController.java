@@ -77,7 +77,7 @@ public class TripController {
             response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
         });
 
-        Query q = dbRef.limitToLast(20);
+        Query q = dbRef.limitToLast(15);
         q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {

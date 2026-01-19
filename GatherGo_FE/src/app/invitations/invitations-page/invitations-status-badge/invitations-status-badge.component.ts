@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import {InviteStatus} from "../../domain/invite-status";
 import {NgIf} from "@angular/common";
 
@@ -30,12 +30,19 @@ const STATUS_MAP = {
   ],
   styleUrls: ['./invitations-status-badge.component.scss']
 })
-export class InvitationsStatusBadgeComponent implements OnInit{
+export class InvitationsStatusBadgeComponent implements OnInit, OnChanges {
   @Input() status: InviteStatus | undefined | null = undefined;
   mainColor: string = '';
   backgroundColor: string = '';
 
   ngOnInit() {
+    if(this.status) {
+      this.mainColor = STATUS_MAP[this.status].mainColor;
+      this.backgroundColor = STATUS_MAP[this.status].backgroundColor;
+    }
+  }
+
+  ngOnChanges() {
     if(this.status) {
       this.mainColor = STATUS_MAP[this.status].mainColor;
       this.backgroundColor = STATUS_MAP[this.status].backgroundColor;

@@ -28,4 +28,16 @@ export class InviteService {
   public updateInvite(invite: InviteDto) {
     return this.http.post<InviteDto>(this.url, invite);
   }
+
+  clearInvites(toClear: (string | undefined | null)[]) {
+    const filtered: string[] = []
+
+    toClear.forEach(uuid => {
+      if(uuid) {
+        filtered.push(uuid);
+      }
+    })
+
+    return this.http.post(this.url + "/clear", filtered);
+  }
 }

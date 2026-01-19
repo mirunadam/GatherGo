@@ -88,7 +88,9 @@ export class TripFormComponent implements OnInit {
 
     if(this.editUuid) {
       this.tripService.getTripByUuid(this.editUuid).subscribe((res) => {
+        console.log(res);
         this.tripForm.patchValue({
+          name: res.name,
           location: res.location,
           ownerEmail: res.ownerEmail,
           dateStart: res.dateStart,
@@ -211,6 +213,7 @@ export class TripFormComponent implements OnInit {
   }
 
   private submitForm(mainImageUrl: string | null, extraImages: string[] = []) {
+
     const trip: TripDto = {
       uuid: this.editUuid ?? crypto.randomUUID(),
       ownerEmail: this.tripForm.value.ownerEmail,
@@ -228,6 +231,7 @@ export class TripFormComponent implements OnInit {
       isPublic: this.userData?.role === UserRole.AGENCY ? (this.tripForm.value.isPublic ?? false) : false,
       participants: this.tripForm.value.participants ?? []
     }
+
 
     this.tripService.createTrip(trip).subscribe(() => {
       this.router.navigate(['/trip']);

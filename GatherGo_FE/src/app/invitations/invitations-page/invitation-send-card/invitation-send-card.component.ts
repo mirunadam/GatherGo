@@ -75,7 +75,10 @@ export class InvitationSendCardComponent implements OnInit{
               sender: this.senderName ?? '',
               tripName: this.inviteForm.value.trip?.name ?? 'Unnamed adventure',
               email: email
+            }).then(() => {
+              window.location.reload()
             })
+
           }
         },
         error: () => {
