@@ -47,6 +47,7 @@ export class InvitationSendCardComponent implements OnInit{
     this.loggedInContext.getUserData().subscribe((userData) => {
       this.senderEmail = userData.email;
       this.senderName = userData.username;
+      console.log(userData);
       this.tripService.getAllTripsByOwner(userData.email).subscribe((res) => {
         this.tripOptions = res;
       })

@@ -190,20 +190,38 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
     
     const line = this.newActivity.trim();
     if (!line) return;
+    
+     const previous = this.trip.itinerary || '';
+      this.trip.itinerary = previous.trim()
+        ? `${previous}\n${line}`
+        : line;
+
+      // clear UI immediately too
+      this.newActivity = '';
+      this.showActivityForm = false;
+      this.errorMsg = null;
 
     this.getUserEmail$()
       .pipe(switchMap(email => this.tripService.addItineraryItem(this.trip!.uuid, email, line)))
       .subscribe({
         next: (updatedTrip) => {
           this.trip = updatedTrip;
-          this.newActivity = '';
-          this.showActivityForm = false;
+          this.refreshTrip();
+          // this.newActivity = '';
+          // this.showActivityForm = false;
         },
         error: (err) => {
           console.error('Failed to save activity', err);
+          if (this.trip) this.trip.itinerary = previous;
           this.errorMsg = 'Failed to save activity.';
         }
       });
+  }
+
+  isMember(t: TripDto): boolean {
+    if (!this.userEmail) return false;
+    return t.ownerEmail?.toLowerCase() === this.userEmail.toLowerCase()
+      || (t.participants ?? []).some(p => p.toLowerCase() === this.userEmail!.toLowerCase());
   }
 
   addAccommodation() {
@@ -217,16 +235,27 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
     const item = this.newAccommodation.trim();
     if (!item) return;
 
+    const prev = [...(this.trip.accommodationSuggestions ?? [])];
+    (this.trip.accommodationSuggestions ??= []).push(item);
+
+    this.newAccommodation = '';
+  this.showAccommodationForm = false;
+  this.errorMsg = null;
+
+
     this.getUserEmail$()
       .pipe(switchMap(email => this.tripService.addAccommodation(this.trip!.uuid, email, item)))
       .subscribe({
         next: (updatedTrip) => {
           this.trip = updatedTrip;
-          this.newAccommodation = '';
-          this.showAccommodationForm = false;
+          // this.newAccommodation = '';
+          // this.showAccommodationForm = false;
         },
         error: (err) => {
           console.error('Failed to add accommodation suggestion', err);
+          if (this.trip) {
+            this.trip.accommodationSuggestions = prev;
+          }
           this.errorMsg = 'Failed to add accommodation suggestion';
         }
       });

@@ -261,12 +261,24 @@
   <div class="flex items-center justify-between mb-4">
     <h3 class="text-xl font-semibold text-gray-800">Accommodation suggestions</h3>
 
-    <button
+    <!-- <button
       (click)="showAccommodationForm = !showAccommodationForm"
       class="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition"
     >
       {{ showAccommodationForm ? 'Close' : 'Suggest accommodation' }}
+    </button> -->
+    <button
+      (click)="showAccommodationForm = !showAccommodationForm"
+      [disabled]="!isMember(t)"
+      class="bg-teal-500 text-white px-4 py-2 rounded"
+      [ngClass]="!isMember(t) ? 'opacity-50 cursor-not-allowed' : ''"
+    >
+      {{ showAccommodationForm ? 'Close' : 'Suggest accommodation' }}
     </button>
+
+    <p *ngIf="!isMember(t)" class="text-sm text-gray-500 mt-2">
+      Join the trip to add suggestions.
+    </p>
   </div>
 
   <!-- Suggest form -->
@@ -306,31 +318,28 @@
     </div>
   </form>
 
-  <!-- List -->
   <div class="mt-6">
-    <ng-container *ngIf="t.accommodation?.length; else noAccommodation">
-      <div class="space-y-3">
-        <div
-          *ngFor="let acc of t.accommodation; let i = index"
-          class="bg-white border rounded-lg p-4 shadow-sm"
-        >
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1">
-              <p class="text-gray-800 whitespace-pre-wrap">{{ acc }}</p>
-            </div>
+  <ng-container *ngIf="t.accommodationSuggestions?.length; else noAccommodation">
+    <div class="space-y-3">
+      <div
+        *ngFor="let acc of t.accommodationSuggestions; let i = index"
+        class="bg-white border rounded-lg p-4 shadow-sm"
+      >
+        <div class="flex items-start justify-between gap-4">
+          <p class="text-gray-800 whitespace-pre-wrap flex-1">{{ acc }}</p>
 
-            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              #{{ i + 1 }}
-            </span>
-          </div>
+          <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+            #{{ i + 1 }}
+          </span>
         </div>
       </div>
-    </ng-container>
+    </div>
+  </ng-container>
 
-    <ng-template #noAccommodation>
-      <p class="text-gray-600">No accommodation suggestions yet.</p>
-    </ng-template>
-  </div>
+  <ng-template #noAccommodation>
+    <p class="text-gray-600">No accommodation suggestions yet.</p>
+  </ng-template>
+</div>
 
 </div>
 
