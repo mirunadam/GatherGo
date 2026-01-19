@@ -12,8 +12,12 @@ export class TripService {
   constructor(private http: HttpClient) {
   }
 
-  public getAllTrips() {
-    return this.http.get<TripDto[]>(this.url);
+  public getAllPublicTrips() {
+    return this.http.get<TripDto[]>(this.url + `/public`);
+  }
+
+  public getAllSpecificTrips(email: string) {
+    return this.http.get<TripDto[]>(this.url + `/specific/${email}`);
   }
 
   public getAllTripsByOwner(ownerEmail: string ) {
