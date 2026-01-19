@@ -19,7 +19,7 @@ import java.util.List;
 public class TripController {
     DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("trips");
     //the connection to the database part we want to use
-    //we are connected to the ,,folder" trips in the database using this
+    //we are connected to the "folder" trips in the database using this
 
     @GetMapping()
     //this @GetMapping() will send a request of type GET/api/trips
@@ -50,6 +50,33 @@ public class TripController {
             }
 
             //if something failed we return a http500 to the frontend
+            @Override
+            public void onCancelled(DatabaseError error) {
+                response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+            }
+        });
+
+        return response;
+    }
+
+    @GetMapping("/byOwner/{ownerEmail}")
+    public DeferredResult<ResponseEntity<List<TripDTO>>> getAllTripsByOwner(@PathVariable String ownerEmail) {
+        final DeferredResult<ResponseEntity<List<TripDTO>>> response = new DeferredResult<>();
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<TripDTO> trips = new ArrayList<>();
+
+                for(DataSnapshot tripSnapshot: snapshot.getChildren()) {
+                    TripDTO trip = tripSnapshot.getValue(TripDTO.class);
+                    if(ownerEmail.equals(trip.getOwnerEmail())) {
+                        trips.add(trip);
+                    }
+                }
+
+                response.setResult(ResponseEntity.ok(trips));
+            }
+
             @Override
             public void onCancelled(DatabaseError error) {
                 response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
