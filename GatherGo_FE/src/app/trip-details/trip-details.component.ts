@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
-import { NavigationModule } from '../navigation/navigation.module';
 import { interval, Subscription, map, of, switchMap, tap, throwError } from 'rxjs';
 
 type Tab = 'overview' | 'activities' | 'accommodations' | 'photos' | 'participants';
@@ -21,7 +20,7 @@ type Tab = 'overview' | 'activities' | 'accommodations' | 'photos' | 'participan
 @Component({
   selector: 'app-trip-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavigationModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './trip-details.component.html',
 })
 export class TripDetailsComponent implements OnInit, OnDestroy {

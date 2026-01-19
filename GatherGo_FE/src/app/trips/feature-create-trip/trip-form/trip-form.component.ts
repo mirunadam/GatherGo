@@ -225,16 +225,10 @@ export class TripFormComponent implements OnInit {
       maxPeople: this.tripForm.value.maxPeople,
       itinerary:  this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
-<<<<<<< HEAD
       accommodationSuggestions: this.tripForm.value.accommodationSuggestions ?? [],
-      imageURL: mainImageUrl,
-      imageURLs: extraImages,
-      isPublic: this.userData?.role === UserRole.USER ? (this.tripForm.value.isPublic ?? false) : true,
-=======
       imageURL: mainImageUrl ?? this.imagePreviewUrl,
       imageURLs: extraImages ?? this.extraImages,
       isPublic: this.userData?.role === UserRole.AGENCY ? (this.tripForm.value.isPublic ?? false) : false,
->>>>>>> 05a29718651dd6ea7b04d6af15499c4402efd949
       participants: this.tripForm.value.participants ?? []
     }
 
