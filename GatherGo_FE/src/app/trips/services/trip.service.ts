@@ -54,6 +54,14 @@ export class TripService {
     );
   }
 
+  addImageUrl(uuid: string, email: string, url: string){
+      return this.http.post<TripDto>(
+    `${this.url}/addImageUrl`,
+    null,
+    { params: { uuid, email, url } }
+  );
+  }
+
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }

@@ -395,12 +395,67 @@
 </div>
 
 </div>
+            <div *ngIf="activeTab === 'photos'">
+            <h3 class="text-xl mb-4">Photos</h3>
 
-        <!-- PHOTOS -->
+            <!-- Upload controls (only if member) -->
+            <div class="mb-6">
+              <div class="flex items-center gap-3">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  (change)="onMultipleFilesSelected($event)"
+                  [disabled]="!isMember(t) || isUploadingPhotos"
+                />
+
+                <button
+                  (click)="uploadPhotos()"
+                  class="bg-teal-500 text-white px-4 py-2 rounded"
+                  [disabled]="!isMember(t) || multipleFiles.length === 0"
+                  [ngClass]="(!isMember(t) || multipleFiles.length === 0) ? 'opacity-50 cursor-not-allowed' : ''"
+                >
+                  {{ isUploadingPhotos ? 'Uploading...' : 'Upload Photos' }}
+                </button>
+              </div>
+
+              <p *ngIf="!isMember(t)" class="text-sm text-gray-500 mt-2">
+                Join the trip to upload photos.
+              </p>
+
+              <!-- Previews of selected files -->
+              <div *ngIf="multipleImagePreviewUrls.length" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                <div *ngFor="let preview of multipleImagePreviewUrls; let i = index" class="relative">
+                  <img [src]="preview" class="w-full h-32 object-cover rounded" />
+                  <button
+                    type="button"
+                    (click)="removePhoto(i)"
+                    class="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Existing gallery -->
+            <div *ngIf="t.imageURLs?.length; else noPhotos" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div *ngFor="let img of t.imageURLs" class="bg-gray-50 rounded overflow-hidden">
+                <img [src]="img" class="w-full h-48 object-cover" alt="Trip photo" />
+              </div>
+            </div>
+
+            <ng-template #noPhotos>
+              <p class="text-gray-600">No photos uploaded yet.</p>
+            </ng-template>
+          </div>
+
+
+        <!-- PHOTOS
         <div *ngIf="activeTab === 'photos'">
           <h3 class="text-xl mb-4">Photos</h3>
 
-          <!-- Extra images saved in TripDto.imageURLs -->
+          Extra images saved in TripDto.imageURLs
           <div *ngIf="t.imageURLs?.length; else noPhotos" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div *ngFor="let img of t.imageURLs" class="bg-gray-50 rounded overflow-hidden">
               <img [src]="img" class="w-full h-48 object-cover" alt="Trip photo" />
@@ -414,7 +469,7 @@
             <p class="text-gray-600">No photos uploaded yet.</p>
           </ng-template>
 
-          <!-- Optional: if you also have photos[] with like support -->
+            Optional: if you also have photos[] with like support 
           <div *ngIf="photos.length" class="mt-8">
             <h4 class="text-lg mb-2">Interactive photos</h4>
             <div *ngFor="let p of photos" class="bg-gray-50 p-4 rounded mt-3">
@@ -430,7 +485,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- PARTICIPANTS -->
             <div *ngIf="activeTab === 'participants'">

@@ -6,6 +6,8 @@ import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
 import { interval, Subscription, map, of, switchMap, tap, throwError } from 'rxjs';
+import { FileUploadService } from '../services/file-upload.service';
+import { forkJoin, Observable} from 'rxjs';
 
 type Tab = 'overview' | 'activities' | 'accommodations' | 'photos' | 'participants';
 
@@ -64,6 +66,7 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
     private location: Location,
     private tripService: TripService,
     private profileService: ProfileService,
+    private fileUploadService: FileUploadService,
   ) {}
 
   ngOnInit() {
@@ -83,7 +86,7 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.refreshSub = interval(15000).subscribe(() => this.refreshTrip());
+    //this.refreshSub = interval(15000).subscribe(() => this.refreshTrip());
   }
 
   ngOnDestroy() {
@@ -237,14 +240,12 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
       this.showActivityForm = false;
       this.errorMsg = null;
 
-    this.getUserEmail$()
-      .pipe(switchMap(email => this.tripService.addItineraryItem(this.trip!.uuid, email, line)))
-      .subscribe({
-        next: (updatedTrip) => {
-          this.trip = updatedTrip;
-          this.refreshTrip();
-          // this.newActivity = '';
-          // this.showActivityForm = false;
+      this.trip.itinerary=this.trip.itinerary.concat(this.newActivity);
+      console.log(this.trip.itinerary);
+
+     this.tripService.createTrip(this.trip).subscribe({
+        next: (saved: any) => {
+          this.trip = saved;
         },
         error: (err) => {
           console.error('Failed to save activity', err);
@@ -252,6 +253,21 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
           this.errorMsg = 'Failed to save activity.';
         }
       });
+    // this.getUserEmail$()
+    //   .pipe(switchMap(email => this.tripService.addItineraryItem(this.trip!.uuid, email, line)))
+    //   .subscribe({
+    //     next: (updatedTrip) => {
+    //       this.trip = updatedTrip;
+    //       this.refreshTrip();
+    //       // this.newActivity = '';
+    //       // this.showActivityForm = false;
+    //     },
+    //     error: (err) => {
+    //       console.error('Failed to save activity', err);
+    //       if (this.trip) this.trip.itinerary = previous;
+    //       this.errorMsg = 'Failed to save activity.';
+    //     }
+    //   });
   }
 
   isMember(t: TripDto): boolean {
@@ -275,27 +291,252 @@ export class TripDetailsComponent implements OnInit, OnDestroy {
     (this.trip.accommodationSuggestions ??= []).push(item);
 
     this.newAccommodation = '';
-  this.showAccommodationForm = false;
-  this.errorMsg = null;
+    this.showAccommodationForm = false;
+    this.errorMsg = null;
 
+    //this.trip.accommodationSuggestions = this.trip.accommodationSuggestions.concat(this.newAccommodation);
+    console.log(this.trip.accommodationSuggestions);
 
-    this.getUserEmail$()
-      .pipe(switchMap(email => this.tripService.addAccommodation(this.trip!.uuid, email, item)))
-      .subscribe({
-        next: (updatedTrip) => {
-          this.trip = updatedTrip;
-          // this.newAccommodation = '';
-          // this.showAccommodationForm = false;
-        },
-        error: (err) => {
-          console.error('Failed to add accommodation suggestion', err);
-          if (this.trip) {
-            this.trip.accommodationSuggestions = prev;
-          }
-          this.errorMsg = 'Failed to add accommodation suggestion';
-        }
-      });
+    this.tripService.createTrip(this.trip).subscribe({
+    next: (saved: any) => {
+      this.trip = saved;
+    },
+    error: (err) => {
+      console.error('Failed to save accommodation', err);
+      if (this.trip) this.trip.accommodationSuggestions = prev;
+      this.errorMsg = 'Failed to save accommodation.';
+    }
+  });
+
   }
+    // this.getUserEmail$()
+    //   .pipe(switchMap(email => this.tripService.addAccommodation(this.trip!.uuid, email, item)))
+    //   .subscribe({
+    //     next: (updatedTrip) => {
+    //       this.trip = updatedTrip;
+    //       // this.newAccommodation = '';
+    //       // this.showAccommodationForm = false;
+    //     },
+    //     error: (err) => {
+    //       console.error('Failed to add accommodation suggestion', err);
+    //       if (this.trip) {
+    //         this.trip.accommodationSuggestions = prev;
+    //       }
+    //       this.errorMsg = 'Failed to add accommodation suggestion';
+    //     }
+    //   });
+
+    // showPhotoForm = false;
+    // newPhotoUrl = '';
+
+    // multipleFiles: File[] = [];
+    // multipleImagePreviewUrls: string[] = [];
+
+//   onMultipleFilesSelected(event: any) {
+//     const files: FileList = event.target.files;
+
+//     for (let i = 0; i < files.length; i++) {
+//       const file = files[i];
+//       this.multipleFiles.push(file);
+//       this.multipleImagePreviewUrls.push(URL.createObjectURL(file));
+//     }
+//   }
+
+//     removeSelectedPhoto(index: number) {
+//       this.multipleFiles.splice(index, 1);
+//       this.multipleImagePreviewUrls.splice(index, 1);
+//     }
+
+//   private uploadExtraPhotosFromDetails(): Observable<string[]> {
+//   if (this.multipleFiles.length === 0) {
+//     return of([]);
+//   }
+
+//   const uploads = this.multipleFiles.map(file => {
+//     const formData = new FormData();
+//     formData.append('image', file);
+//     return this.fileUploadService.uploadFile(formData); // returns Observable<string>
+//   });
+
+//   return forkJoin(uploads);
+// }
+
+// private saveImageUrlsToTrip(uuid: string, email: string, urls: string[]): Observable<TripDto> {
+//   if (urls.length === 0) {
+//     // nothing to save -> just return current trip as observable
+//     return of(this.trip!);
+//   }
+
+//   // call addImageUrl for each url, and take the last updated TripDto as final result
+//   const calls = urls.map(u => this.tripService.addImageUrl(uuid, email, u));
+//   return forkJoin(calls).pipe(
+//     // forkJoin returns TripDto[] (one per call), take the last one
+//     switchMap((results) => of(results[results.length - 1]))
+//   );
+// }
+
+  // selectedFile: File | null = null;
+  // imagePreviewUrl: string | null | undefined = null;
+
+  //Mara
+  multipleFiles: File[] = [];
+  multipleImagePreviewUrls: string[] = [];
+  extraImages: string[] = [];
+
+   onMultipleFilesSelected(event: any){
+    const files: FileList=event.target.files;
+
+    for(let i=0;i<files.length;i++){
+      const file=files[i];
+      this.multipleFiles.push(file);
+      const url=URL.createObjectURL(file);
+      this.multipleImagePreviewUrls.push(url);
+    }
+  }
+
+  removePhoto(index: number){
+    this.multipleFiles.splice(index,1);
+    this.multipleImagePreviewUrls.splice(index,1);
+    this.extraImages.splice(index,1);
+  }
+
+  private uploadExtraPhotos():Observable<string[]>{
+      if (this.multipleFiles.length === 0) {
+        return of(this.extraImages);
+      }
+
+      const observables = this.multipleFiles.map(file => {
+        const formData = new FormData();
+        formData.append('image', file);
+        return this.fileUploadService.uploadFile(formData);
+      });
+
+      return forkJoin(observables);
+  }
+
+  isUploadingPhotos = false;
+
+  uploadPhotos(){
+    if (this.multipleFiles.length === 0) {
+        return;
+    }
+    
+    this.multipleFiles.forEach((file) => {
+      const formData = new FormData();
+      formData.append('image', file);
+      this.fileUploadService.uploadFile(formData).pipe(tap(()=>{this.isUploadingPhotos = true})).subscribe(response => {
+        this.trip?.imageURLs?.push(response);
+        console.log(response)
+        this.isUploadingPhotos = false;
+        this.tripService.createTrip(this.trip!).subscribe();
+      });
+    })
+  }
+
+  // uploadPhotoss() {
+    // const formData = new FormData();
+    // if(this.selectedFile) {
+    //   formData.append('image', this.selectedFile);
+
+  //     this.fileUploadService.uploadFile(formData).pipe(tap(()=>{this.isUploadingPhotos = true})).subscribe(response => {
+  //       this.trip?.imageURLs?.push(response);
+  //       this.isUploadingPhotos = false;
+  //     });
+  //   }
+  //   this.tripService.createTrip(this.trip!);
+  // }
+
+
+  // uploadPhotosToTrip() {
+  // if (!this.trip) return;
+
+  // if (!this.isLoggedIn) {
+  //   this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+  //   return;
+  // }
+
+  // this.isUploadingPhotos = true;
+  // this.errorMsg = null;
+
+  // const uuid = this.trip.uuid;
+
+
+
+  // this.getUserEmail$().pipe(
+  //   switchMap(email =>
+  //     this.uploadExtraPhotosFromDetails().pipe(
+  //       switchMap((uploadedUrls) => {
+  //         // ✅ optimistic UI update (instant)
+  //         const prev = [...(this.trip!.imageURLs ?? [])];
+  //         const newList = [...prev, ...uploadedUrls];
+  //         this.trip!.imageURLs = newList;
+
+  //         // clear selection UI immediately
+  //         this.multipleFiles = [];
+  //         this.multipleImagePreviewUrls = [];
+
+  //         // save each url in backend
+  //         return this.saveImageUrlsToTrip(uuid, email, uploadedUrls).pipe(
+  //           // if backend fails, revert
+  //           // NOTE: if you want per-url revert, we can do that too
+  //           // but this is simplest and matches your pattern
+  //           // (if it errors, we restore prev list)
+  //           // handled in error below
+  //         );
+  //       })
+  //     )
+  //   )
+  // ).subscribe({
+  //   next: (updatedTrip) => {
+  //     this.trip = updatedTrip;      // backend truth
+  //     this.isUploadingPhotos = false;
+  //     // optional: refreshTrip() if you want extra safety
+  //     // this.refreshTrip();
+  //   },
+  //   error: (err) => {
+  //     console.error('Failed to upload/save photos', err);
+  //     this.isUploadingPhotos = false;
+  //     this.errorMsg = 'Failed to upload photos.';
+  //     // if you want perfect revert, store prev before optimistic update
+  //     // (tell me if you want per-url revert)
+  //     this.refreshTrip(); // simplest revert: reload from server
+  //   }
+  // });
+//}
+  // addPhotoUrl() {
+  //   if (!this.trip) return;
+
+  //   if (!this.isLoggedIn) {
+  //     this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+  //     return;
+  //   }
+
+  //   const url = this.newPhotoUrl.trim();
+  //   if (!url) return;
+
+  //   // optimistic UI update
+  //   const prev = [...(this.trip.imageURLs ?? [])];
+  //   const already = (this.trip.imageURLs ?? []).some(u => u.trim().toLowerCase() === url.toLowerCase());
+  //   if (!already) (this.trip.imageURLs ??= []).push(url);
+
+  //   this.newPhotoUrl = '';
+  //   this.showPhotoForm = false;
+  //   this.errorMsg = null;
+
+  //   this.getUserEmail$()
+  //     .pipe(switchMap(email => this.tripService.addImageUrl(this.trip!.uuid, email, url)))
+  //     .subscribe({
+  //       next: (updatedTrip) => {
+  //         this.trip = updatedTrip; // backend truth
+  //         this.refreshTrip();      // optional: force reload
+  //       },
+  //       error: (err) => {
+  //         console.error('Failed to add image url', err);
+  //         if (this.trip) this.trip.imageURLs = prev; // revert
+  //         this.errorMsg = 'Failed to add image url.';
+  //       }
+  //     });
+  // }
 
   toggleLike(photoId: string) {
     this.likedPhotos.has(photoId) ? this.likedPhotos.delete(photoId) : this.likedPhotos.add(photoId);
