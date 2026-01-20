@@ -47,8 +47,14 @@ export class FeatureTripListComponent implements OnInit{
           });
           return tripWithCity;
         })
-      })
-    })
+
+        console.log(this.tripsWithCity);
+
+        this.tripsWithCity = this.tripsWithCity.filter((tripWithCity) => {
+          return tripWithCity.trip.isPublic || tripWithCity.trip.ownerEmail === email
+        })
+      });
+    });
   }
 
   private extractCityAndCountry(result: google.maps.GeocoderResult) {

@@ -71,6 +71,7 @@ export class TripFormComponent implements OnInit {
     maxPeople: [null as number | null, [Validators.min(0)]],
     itinerary: [null as string | null, []],
     accommodation: [null as string | null, []],
+    accommodationSuggestions: [[] as string[]],
     isPublic: [false],
     participants: [[] as string[]]
   })
@@ -100,6 +101,7 @@ export class TripFormComponent implements OnInit {
           maxPeople: res.maxPeople,
           itinerary: res.itinerary,
           accommodation: res.accommodation,
+          accommodationSuggestions: res.accommodationSuggestions ?? [],
           isPublic: res.isPublic,
           participants: res.participants
         })
@@ -224,8 +226,9 @@ export class TripFormComponent implements OnInit {
       budget: this.tripForm.value.budget,
       currency: this.tripForm.value.currency,
       maxPeople: this.tripForm.value.maxPeople,
-      itinerary: this.tripForm.value.itinerary,
+      itinerary:  this.tripForm.value.itinerary,
       accommodation: this.tripForm.value.accommodation,
+      accommodationSuggestions: this.tripForm.value.accommodationSuggestions ?? [],
       imageURL: mainImageUrl ?? this.imagePreviewUrl,
       imageURLs: extraImages ?? this.extraImages,
       isPublic: this.userData?.role === UserRole.AGENCY ? (this.tripForm.value.isPublic ?? false) : false,

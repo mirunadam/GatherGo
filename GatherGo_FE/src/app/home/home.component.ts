@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { TripService } from '../trips/services/trip.service';
 import { TripDto } from '../trips/domain/trip.dto';
+//import { NavigationModule } from '../navigation/navigation.module';
 // import { NgFor, NgIf } from '@angular/common';
 // import { NgModel } from '@angular/forms';
 // import { NgClass } from '@angular/common';
@@ -35,10 +36,16 @@ const STATIC_TRIPS: FrontendTrip[] = [
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  // standalone: true,
+  // imports: [
+  //   NgFor,
+  //   NgIf,
+  //   FormsModule,
+  // ],
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-
+  
   // Google Maps Geocoder
   private geocoder = new google.maps.Geocoder();
 
@@ -91,15 +98,47 @@ export class HomeComponent implements OnInit {
   private mapTripDtoToFrontendModel(dto: TripDto): FrontendTrip {
 
     // Create the base object
-    const frontendTrip: FrontendTrip = {
-      id: dto.uuid,
-      name: dto.name || 'Unnamed Adventure',
-      location: 'Loading location...', // Placeholder while geocoding runs
-      agency: 'Community Trip',
-      price: dto.budget || 0,
-      period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
-      imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
-    };
+    // const frontendTrip: FrontendTrip = {
+    //   id: dto.uuid,
+    //   name: 'Unnamed Adventure', // Use itinerary as name fallback
+    //   location: 'Loading location...', // Placeholder while geocoding runs
+    //   agency: 'Community Trip', 
+    //   price: dto.budget || 0,
+    //   period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
+    //   imageUrl: dto.imageURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80' // Default image
+    // };
+    // const itineraryArray: string[] = Array.isArray(dto.itinerary)
+    // ? dto.itinerary : [];
+    // : (typeof dto.itinerary === 'string' && dto.itinerary.trim()
+    //     ? dto.itinerary.split('\n').map(s => s.trim()).filter(Boolean)
+    //     : []);
+
+  const itineraryText =
+  typeof dto.itinerary === 'string' ? dto.itinerary : '';
+
+  const itineraryLines = itineraryText
+    .split('\n')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const tripName =
+    (dto.name && dto.name.trim()) ||
+    (itineraryLines.length ? itineraryLines[0] : '') ||
+    'Unnamed Adventure';
+
+  // Create the base object (sync fields)
+  const frontendTrip: FrontendTrip = {
+    id: dto.uuid,
+    name: tripName,
+    location: 'Loading location...',
+    agency: dto.ownerEmail ? `Created by ${dto.ownerEmail}` : 'Community Trip',
+    price: dto.budget ?? 0,
+    period: this.formatDatePeriod(dto.dateStart, dto.dateEnd),
+    imageUrl:
+      dto.imageURL ||
+      (Array.isArray(dto.imageURLs) && dto.imageURLs.length ? dto.imageURLs[0] : '') ||
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1080&q=80',
+  };
 
     if (dto.location && dto.location.latitude && dto.location.longitude) {
       const latLng = { lat: dto.location.latitude, lng: dto.location.longitude };
@@ -177,6 +216,10 @@ export class HomeComponent implements OnInit {
   onNavigate(path: string): void {
     this.router.navigate([`/${path}`]);
   }
+
+  onNavigateToTripDetails(uuid: string) {
+  this.router.navigate(['trip', uuid]);
+}
 
   logout(): void {
     localStorage.clear();

@@ -13,6 +13,7 @@ export interface TripDto {
   maxPeople: number | null | undefined;
   itinerary: string | null | undefined;
   accommodation: string | null | undefined;
+  accommodationSuggestions: string[] | null | undefined;
   imageURL: string | null | undefined;
   imageURLs?: string[];
   isPublic: boolean;

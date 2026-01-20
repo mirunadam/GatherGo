@@ -23,35 +23,40 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
+import { TripDetailsComponent } from './trip-details/trip-details.component';
+//import { NavigationModule } from './navigation/navigation.module';
+import {DashboardComponent} from './dashboard/dashboard.component';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        LoginComponent,
-        RegisterComponent,
-        HomeComponent,
-        ProfileComponent,
-        NavigationComponent,
-    ],
-    imports: [
-        BrowserModule,
-        HttpClientModule,
-        AppRoutingModule,
-        FormsModule,
-        AngularFireModule.initializeApp(environment.firebase), // Initialize Firebase app
-        AngularFireAuthModule,
-        GoogleMapsModule,
-        BrowserAnimationsModule,
-        TripViewCardComponent,
-        TripFormComponent,
-        CommonModule,
-        RouterModule,
-        FeatureTripListComponent,
-        MatIconModule,
-        provideFirebaseApp(() => initializeApp(environment.firebase)),
-        provideAuth(() => getAuth()),
-    ],
-    providers: [],
-    bootstrap: [AppComponent]
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    RegisterComponent,
+    HomeComponent,
+    ProfileComponent,
+    NavigationComponent,
+    DashboardComponent,
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule,
+    FormsModule,
+    AngularFireModule.initializeApp(environment.firebase), // Initialize Firebase app
+    AngularFireAuthModule,
+    GoogleMapsModule,
+    BrowserAnimationsModule,
+    TripViewCardComponent,
+    TripFormComponent,
+    CommonModule,
+    RouterModule,
+    FeatureTripListComponent,
+    MatIconModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    TripDetailsComponent,
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

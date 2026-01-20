@@ -38,6 +38,30 @@ export class TripService {
       });
   }
 
+    addItineraryItem(uuid: string, email: string, item: string) {
+    return this.http.post<TripDto>(
+      `${this.url}/addItineraryItem`,
+      null,
+      { params: { uuid, email, item } }
+    );
+  }
+
+  addAccommodation(uuid: string, email: string, item: string) {
+    return this.http.post<TripDto>(
+      `${this.url}/addAccommodation`,
+      null,
+      { params: { uuid, email, item } }
+    );
+  }
+
+  addImageUrl(uuid: string, email: string, url: string){
+      return this.http.post<TripDto>(
+    `${this.url}/addImageUrl`,
+    null,
+    { params: { uuid, email, url } }
+  );
+  }
+
   public createTrip(trip: TripDto) {
     return this.http.post(this.url + '/create', trip);
   }
