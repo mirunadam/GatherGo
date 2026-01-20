@@ -1,5 +1,6 @@
 package com.gathergo.trips.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gathergo.shared.dto.CurrencyCode;
 import com.gathergo.shared.dto.PointDTO;
 
@@ -21,6 +22,7 @@ public class TripDTO {
     private String accommodation;
     private List<String> accommodationSuggestions;
     private String imageURL;//main trip Image
+    @JsonProperty("isPublic")
     private boolean isPublic;
     //Mara
     private List<String> imageURLs;

@@ -1,6 +1,7 @@
 package com.gathergo.invites.controller;
 
 import com.gathergo.invites.dto.InviteDto;
+import com.gathergo.trips.dto.TripDTO;
 import com.google.api.core.ApiFuture;
 import com.google.firebase.database.*;
 import org.springframework.http.HttpStatus;
@@ -113,5 +114,26 @@ public class InvitesController {
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PostMapping("/clear")
+    public ResponseEntity<String> clearInvites(@RequestBody List<String> uuidList) {
+        for(String uuid: uuidList) {
+            dbRef.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    InviteDto invite = snapshot.getValue(InviteDto.class);
+                    invite.setDeleted(true);
+                    dbRef.child(uuid).setValueAsync(invite);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+            });
+        }
+
+        return ResponseEntity.ok().build();
     }
 }

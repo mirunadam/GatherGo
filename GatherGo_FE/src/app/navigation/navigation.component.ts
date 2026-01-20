@@ -34,7 +34,12 @@ export class NavigationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.checkLoginStatus();
+    this.authService.getLoginSubject().subscribe(loggedIn => {
+      if(loggedIn !== undefined) {
+        this.userName = localStorage.getItem('username');
+        this.isLoggedIn = loggedIn;
+      }
+    })
   }
 
   get userRole(): UserRole {
@@ -67,14 +72,8 @@ export class NavigationComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  checkLoginStatus(): void {
-    this.userName = localStorage.getItem('username');
-    this.isLoggedIn = !!localStorage.getItem('idToken');
-  }
-
   logout(): void {
     this.authService.logout();
-    this.checkLoginStatus();
     this.router.navigate(['/login']);
   }
 }

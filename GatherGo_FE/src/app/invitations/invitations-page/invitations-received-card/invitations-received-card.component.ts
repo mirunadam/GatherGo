@@ -20,7 +20,7 @@ import {InvitationsStatusBadgeComponent} from "../invitations-status-badge/invit
     InvitationsStatusBadgeComponent
   ],
   templateUrl: './invitations-received-card.component.html',
-  styleUrls: ['./invitations-received-card.component.scss']
+  styleUrls: ['./invitations-received-card.component.scss'],
 })
 export class InvitationsReceivedCardComponent implements OnInit {
 
@@ -30,7 +30,7 @@ export class InvitationsReceivedCardComponent implements OnInit {
   constructor(
     private inviteService: InviteService,
     private loggedInContext: LoggedInContextService,
-    private tripService:TripService
+    private tripService:TripService,
   ) {}
 
   ngOnInit() {
@@ -61,8 +61,13 @@ export class InvitationsReceivedCardComponent implements OnInit {
     invite.status = InviteStatus.REJECTED;
     this.inviteService.updateInvite(invite).subscribe();
   }
+
   clearResponded(){
-    
+    const toClear = this.invites.map(invite => invite.uuid);
+
+    this.inviteService.clearInvites(toClear).subscribe(() => {
+      window.location.reload();
+    });
   }
 
   protected readonly InviteStatus = InviteStatus;

@@ -1,4 +1,4 @@
-//this Angular's Component decorator 
+//this Angular's Component decorator
 import { Component } from '@angular/core';
 //What u use to talk to the backend APi
 import { AuthService, LoginPayload } from '../services/auth.service';
