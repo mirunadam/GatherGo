@@ -155,7 +155,7 @@ public class TripDTO {
     }
 
     public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
+        this.isPublic = aPublic;
     }
 
     public List<String> getParticipants() {
@@ -212,14 +212,11 @@ public class TripDTO {
 
     public boolean containsImageUrl(String url) {
         if (url == null) return false;
-        String u = url.trim();
-        return getImageURLs().stream().anyMatch(x -> x != null && x.trim().equalsIgnoreCase(u));
+        return getImageURLs().stream().anyMatch(u -> u != null && u.equals(url));
     }
 
     public void addImageUrl(String url) {
         if (url == null || url.isBlank()) return;
-        if (!containsImageUrl(url)) {
-            getImageURLs().add(url.trim());
-        }
+        getImageURLs().add(url.trim());
     }
 }

@@ -178,8 +178,16 @@ public class TripController {
         //we point to a specific child in the database base on the id
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                response.setResult(ResponseEntity.ok(snapshot.getValue(TripDTO.class)));
+//                response.setResult(ResponseEntity.ok(snapshot.getValue(TripDTO.class)));
                 //if ok we convert it into a TripDTo and put it in the response
+                try {
+                    TripDTO trip = snapshot.getValue(TripDTO.class);
+                    response.setResult(ResponseEntity.ok(trip));
+                } catch (Exception ex) {
+                    System.err.println("getTripById FAILED for uuid=" + tripid);
+                    ex.printStackTrace();
+                    response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                }
             }
 
             @Override
@@ -292,7 +300,7 @@ public class TripController {
                 }
 
                 try {
-                    trip.addItinerary(item.trim());
+                    trip.addAccommodation(item.trim());
                     response.setResult(createOrUpdateTrip(trip));
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -320,33 +328,41 @@ public class TripController {
         dbRef.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                TripDTO trip = dataSnapshot.getValue(TripDTO.class);
-                if (trip == null) {
-                    response.setResult(ResponseEntity.notFound().build());
-                    return;
-                }
+                try {
+                    TripDTO trip = dataSnapshot.getValue(TripDTO.class);
+                    if (trip == null) {
+                        response.setResult(ResponseEntity.notFound().build());
+                        return;
+                    }
 
-                // permission check (same logic as itinerary/accommodation)
-                if (!trip.canEditTrip(email)) {
-                    response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
-                    return;
-                }
+                    if (!trip.canEditTrip(email)) {
+                        response.setResult(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+                        return;
+                    }
 
-                if (url == null || url.trim().isEmpty()) {
-                    response.setResult(ResponseEntity.badRequest().build());
-                    return;
-                }
+                    if (url == null || url.trim().isEmpty()) {
+                        response.setResult(ResponseEntity.badRequest().build());
+                        return;
+                    }
 
-                if (!trip.containsImageUrl(url)) {
-                    trip.addImageUrl(url);
-                    response.setResult(ResponseEntity.ok(createOrUpdateTrip(trip).getBody()));
-                } else {
-                    response.setResult(ResponseEntity.ok(trip));
+                    if (!trip.containsImageUrl(url)) {
+                        trip.addImageUrl(url);
+                        response.setResult(ResponseEntity.ok(createOrUpdateTrip(trip).getBody()));
+                    } else {
+                        response.setResult(ResponseEntity.ok(trip));
+                    }
+                } catch (Exception ex) {
+                    System.err.println("addImageUrl FAILED for uuid=" + uuid);
+                    System.err.println("email=" + email);
+                    System.err.println("url=" + url);
+                    ex.printStackTrace();
+                    response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                if (databaseError.toException() != null) databaseError.toException().printStackTrace();
                 response.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
             }
         });
